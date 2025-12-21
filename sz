@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор СЗ: Компенсация в заработную плату</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: white;
+        }
+        
+        /* Эмуляция листа A4 */
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 0 auto 20px auto; 
+            background: white;
+            box-shadow: none;
+            border: 1px solid #000;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.15;
+            color: #000;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Сетка заголовка документа */
+        .doc-header-grid {
+            display: grid;
+            grid-template-columns: 60% 40%; 
+            gap: 0 10px;
+            margin-bottom: 5px;
+        }
+        
+        .doc-col {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .doc-line {
+            min-height: 1.2em;
+        }
+
+        /* Поля ввода */
+        .input-field {
+            border: 1px solid #000;
+            border-radius: 0;
+            transition: none;
+            background: repeating-linear-gradient(
+                45deg,
+                #fafbff 0px,
+                #fafbff 4px,
+                rgba(250, 251, 255, 0.3) 4px,
+                rgba(250, 251, 255, 0.3) 8px
+            );
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: none;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+        }
+        .input-field:hover {
+            border-color: #000;
+        }
+
+        /* Контейнер для чеков */
+        .receipt-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 20px;
+        }
+        .receipt-img {
+            max-width: 100%;
+            max-height: 250mm; 
+            object-fit: contain;
+            border: 1px solid #000; 
+        }
+        .receipt-label {
+            align-self: flex-start;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 14pt;
+        }
+
+        /* Список чеков в сайдбаре */
+        .receipt-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            background: white;
+            border: 1px solid #000;
+            border-radius: 0;
+            margin-bottom: 8px;
+        }
+
+        /* Стили для header */
+        header {
+            background: white !important;
+            border-bottom: 1px solid #000 !important;
+        }
+        
+        /* Стили для aside */
+        aside {
+            background: white !important;
+            border-right: 1px solid #000 !important;
+        }
+        
+        /* Стили для кнопок */
+        button {
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0 0px,
+                #f0f0f0 4px,
+                rgba(240, 240, 240, 0.3) 4px,
+                rgba(240, 240, 240, 0.3) 8px
+            ) !important;
+            color: #000 !important;
+            border: 1px solid #000 !important;
+            border-radius: 0 !important;
+            font-weight: 600 !important;
+            transition: none !important;
+            box-shadow: none !important;
+        }
+        
+        button:hover {
+            background: repeating-linear-gradient(
+                45deg,
+                #e0e0e0 0px,
+                #e0e0e0 4px,
+                rgba(224, 224, 224, 0.3) 4px,
+                rgba(224, 224, 224, 0.3) 8px
+            ) !important;
+        }
+        
+        button:active {
+            background: repeating-linear-gradient(
+                45deg,
+                #d0d0d0 0px,
+                #d0d0d0 4px,
+                rgba(208, 208, 208, 0.3) 4px,
+                rgba(208, 208, 208, 0.3) 8px
+            ) !important;
+        }
+        
+        /* Стили для селектов */
+        select {
+            border: 1px solid #000 !important;
+            border-radius: 0 !important;
+            background: repeating-linear-gradient(
+                45deg,
+                #fafbff 0px,
+                #fafbff 4px,
+                rgba(250, 251, 255, 0.3) 4px,
+                rgba(250, 251, 255, 0.3) 8px
+            ) !important;
+        }
+        
+        select:focus {
+            outline: none !important;
+            border-color: #000 !important;
+            box-shadow: none !important;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            ) !important;
+        }
+        
+        /* Стили для textarea */
+        textarea {
+            border: 1px solid #000 !important;
+            border-radius: 0 !important;
+            background: repeating-linear-gradient(
+                45deg,
+                #fafbff 0px,
+                #fafbff 4px,
+                rgba(250, 251, 255, 0.3) 4px,
+                rgba(250, 251, 255, 0.3) 8px
+            ) !important;
+        }
+        
+        textarea:focus {
+            outline: none !important;
+            border-color: #000 !important;
+            box-shadow: none !important;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            ) !important;
+        }
+        
+        /* Основной контент */
+        main {
+            background: white !important;
+        }
+        
+        /* Настройки печати */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            html {
+                width: 100%;
+                height: auto;
+                margin: 0;
+                padding: 0;
+            }
+            
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            header, aside {
+                display: none !important;
+            }
+            
+            main.no-print-page {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: visible !important;
+                background: white !important;
+                height: auto !important;
+            }
+            
+            main.no-print-page::after {
+                display: none !important;
+                content: none !important;
+            }
+            
+            .pages-container {
+                display: block !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: white !important;
+            }
+            
+            .pages-container::after {
+                display: none !important;
+                content: none !important;
+            }
+            
+            .a4-page {
+                box-shadow: none !important;
+                border: none !important;
+                margin: 0 !important;
+                width: 100% !important;
+                min-height: 297mm !important;
+                page-break-inside: avoid !important;
+                padding: 20mm !important;
+                display: block !important;
+                background: white !important;
+                position: relative !important;
+                box-sizing: border-box !important;
+            }
+            
+            /* Разрыв страницы только для страниц, которые не являются последними */
+            .a4-page:not(:last-child) {
+                page-break-after: always !important;
+            }
+            
+            /* Убираем разрыв страницы после последней страницы */
+            .a4-page:last-child {
+                page-break-after: avoid !important;
+            }
+            
+            .pages-container > .a4-page:last-child {
+                page-break-after: avoid !important;
+            }
+            
+            .receipt-img {
+                border: none !important;
+                max-width: 100% !important;
+                max-height: 257mm !important;
+                height: auto !important;
+                object-fit: contain !important;
+            }
+            
+            #previewAmountTextBlock {
+                background: transparent !important;
+                border: none !important;
+                padding: 0 !important;
+            }
+            
+            @page {
+                size: A4;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* Предотвращаем создание пустой страницы */
+            body::after,
+            html::after {
+                display: none !important;
+                content: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Шапка приложения -->
+    <header class="h-16 flex-none no-print z-20" style="background: white; border-bottom: 1px solid #000;">
+        <div class="container mx-auto px-4 h-full flex items-center justify-end">
+            <div class="flex gap-3">
+                <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 text-sm" style="background: repeating-linear-gradient(45deg, #f0f0f0 0px, #f0f0f0 4px, rgba(240, 240, 240, 0.3) 4px, rgba(240, 240, 240, 0.3) 8px); color: #000; border: 1px solid #000; border-radius: 0; font-weight: 600;">
+                    <span>🖨️ Печать</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Основной контент -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Левая панель: Управление -->
+        <aside class="w-full md:w-[350px] overflow-y-auto no-print flex flex-col z-10" style="background: white; border-right: 1px solid #000;">
+            <div class="p-6">
+                <form id="docForm" class="space-y-4" onsubmit="return false;">
+                    
+                    <!-- 1. ОТ КОГО -->
+                    <div class="space-y-3 border-b border-black pb-4">
+                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">От кого</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Сотрудник</label>
+                            <select id="employeeSelect" 
+                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
+                                <option value="">-- Выберите сотрудника --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">ФИО</label>
+                            <input type="text" id="employeeInput" value="" 
+                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Должность</label>
+                            <input type="text" id="employeeTitleInput" value="" 
+                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Подразделение</label>
+                            <input type="text" id="employeeDepartmentInput" value="" 
+                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                    </div>
+
+                    <!-- 2. ТЕКСТ ЗАЯВЛЕНИЯ -->
+                    <div class="space-y-3 border-b border-black pb-4">
+                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Текст заявления</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Расчетный период</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="periodMonthInput" 
+                                    class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                                    <option value="0">Январь</option>
+                                    <option value="1">Февраль</option>
+                                    <option value="2">Март</option>
+                                    <option value="3">Апрель</option>
+                                    <option value="4">Май</option>
+                                    <option value="5">Июнь</option>
+                                    <option value="6">Июль</option>
+                                    <option value="7">Август</option>
+                                    <option value="8">Сентябрь</option>
+                                    <option value="9">Октябрь</option>
+                                    <option value="10">Ноябрь</option>
+                                    <option value="11">Декабрь</option>
+                                </select>
+                                <select id="periodYearInput" 
+                                    class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Комментарий (обязательно)</label>
+                            <textarea id="commentInput" rows="3" 
+                                class="input-field w-full text-sm text-black"
+                                placeholder="Дополнительный комментарий..." style="padding: 12px 14px;"></textarea>
+                        </div>
+                        <input type="hidden" id="reasonInput" value="">
+                        <div class="hidden">
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Объект</label>
+                            <input type="text" id="objectInput" list="objectsList" placeholder="Выберите или введите..."
+                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                            <datalist id="objectsList"></datalist>
+                            <p id="sheetStatus" class="text-[10px] text-gray-600 mt-1">Загрузка списка из Google Sheets...</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Тип значения</label>
+                            <select id="valueTypeInput" 
+                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                                <option value="amount">Сумма (Руб.)</option>
+                                <option value="hours">Количество часов</option>
+                            </select>
+                        </div>
+                        <div id="amountContainer">
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Сумма (Руб.)</label>
+                            <input type="number" id="amountInput" placeholder="0.00" step="0.01" min="0"
+                                class="input-field w-full text-sm font-bold text-black" style="padding: 12px 14px;">
+                        </div>
+                        <div id="hoursContainer" class="hidden">
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Количество часов</label>
+                            <input type="number" id="hoursInput" placeholder="0" step="1" min="0"
+                                class="input-field w-full text-sm font-bold text-black" style="padding: 12px 14px;">
+                        </div>
+                        <div>
+                             <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Дата док-та</label>
+                             <input type="date" id="dateInput" 
+                                 class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                    </div>
+
+                    <!-- 3. ПРИЛОЖЕНИЕ (ЧЕКИ) -->
+                    <div class="space-y-3 border-b border-black pb-4">
+                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Приложение (Чеки)</h3>
+                        <div>
+                            <label for="receiptsInput" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold w-full justify-center" style="background: repeating-linear-gradient(45deg, #f0f0f0 0px, #f0f0f0 4px, rgba(240, 240, 240, 0.3) 4px, rgba(240, 240, 240, 0.3) 8px); color: #000; border: 1px solid #000; border-radius: 0; font-weight: 600;">
+                                <span>➕ Добавить чеки</span>
+                            </label>
+                            <input type="file" id="receiptsInput" multiple accept="image/*" class="hidden">
+                        </div>
+                        <div id="receiptsList" class="mt-2 space-y-2"></div>
+                        <p id="noReceiptsMsg" class="text-[10px] text-gray-600 text-center py-2 mt-2">Нет добавленных чеков</p>
+                    </div>
+
+                    <!-- 4. АДРЕСАТЫ -->
+                    <div class="space-y-3 border-b border-black pb-4">
+                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Кому</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">ФИО</label>
+                            <input type="text" id="directorInput" value="Бочаровой А.В." 
+                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Должность</label>
+                            <input type="text" id="directorTitleInput" value="Директор региона Владимир" 
+                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                    </div>
+
+                    <div class="space-y-3 border-b border-black pb-4">
+                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Копия</h3>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">ФИО</label>
+                            <input type="text" id="copyToInput" value="Клюкин С.Н." 
+                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Должность</label>
+                            <input type="text" id="copyTitleInput" value="Территориальный менеджер" 
+                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Правая панель: Предпросмотр документа -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start" style="background: white;">
+            
+            <div id="pagesContainer" class="pages-container">
+
+                <!-- Страница 1: Служебная записка -->
+                <div id="documentPage" class="a4-page animate-fade-in-up">
+                    
+                    <div class="flex-none">
+                        <div class="text-center font-bold text-[14pt] uppercase mb-4">
+                            СЛУЖЕБНАЯ ЗАПИСКА
+                        </div>
+
+                        <div class="doc-header-grid text-[11pt]">
+                            <div class="doc-col">
+                                <div class="doc-line">Исх. № <span id="previewOutNum"></span></div>
+                                <div class="doc-line mt-2">от <span id="previewDateFull">«__» _______ 20__ г.</span></div>
+                                <div class="doc-line mt-4">От кого: <span id="previewEmployeeName" class="font-bold">Клюкин С.Н.</span></div>
+                                <div class="doc-line">Должность: <span id="previewEmployeeTitle" class="italic">Территориальный менеджер</span></div>
+                                <div class="doc-line">Подразделение: <span id="previewEmployeeDepartment" class="italic"></span></div>
+                                <div class="doc-line mt-8">Телефон:</div>
+                            </div>
+
+                            <div class="doc-col">
+                                <div class="doc-line">Вх. № <span id="previewInNum"></span></div>
+                                <div class="doc-line mt-2">от «___» ___________ 20__</div>
+                                <div class="doc-line mt-4">Кому: <span id="previewDirectorName" class="font-bold">Бочаровой А.В.</span></div>
+                                <div class="doc-line">Должность: <span id="previewDirectorTitle" class="italic">Директор региона Владимир</span></div>
+                                <div class="doc-line mt-2">Кому (копия): <span id="previewCopyTo">Клюкин С.Н.</span></div>
+                                <div class="doc-line">Должность: <span id="previewCopyTitle">Территориальный менеджер</span></div>
+                                <div class="doc-line mt-2">Телефон:</div>
+                            </div>
+                        </div>
+
+                        <div class="font-medium text-[12pt] mt-4 mb-2">Предмет: Компенсация в заработную плату</div>
+                    </div>
+
+                    <div class="w-full border-b border-black mb-4"></div>
+
+                    <div class="flex-1 flex flex-col pt-24">
+                        <div class="text-justify mb-1 indent-12 leading-relaxed text-[12pt]">
+                            <span id="previewReason">Прошу включить компенсацию в заработную плату за расчетный период</span>.
+                        </div>
+
+                        <div id="previewComment" class="text-justify mb-8 leading-relaxed text-[12pt]"></div>
+
+                        <div id="previewAmountBlock" class="text-justify mb-2 leading-relaxed text-[12pt]">
+                            Сумма компенсации – <span id="previewAmountNum" class="font-bold">____</span> руб.
+                        </div>
+                        <div id="previewHoursBlock" class="text-justify mb-2 leading-relaxed text-[12pt] hidden">
+                            Количество часов – <span id="previewHoursNum" class="font-bold">____</span>
+                        </div>
+                        
+                        <div id="previewAmountTextBlock" class="text-justify italic mb-8 p-2 border border-black text-[12pt]" style="background: repeating-linear-gradient(45deg, #fafbff 0px, #fafbff 4px, rgba(250, 251, 255, 0.3) 4px, rgba(250, 251, 255, 0.3) 8px);">
+                            (<span id="previewAmountText">________________________</span>)
+                        </div>
+
+                        <div id="previewReceiptsText" class="mb-12 text-[12pt]">Чеки прилагаю.</div>
+                    </div>
+
+                    <div class="flex-none mt-auto pt-8">
+                        <div class="flex justify-between items-end text-[12pt]">
+                            <div id="previewEmployeeTitleSig" class="w-1/3 text-[11pt]">Территориальный менеджер</div>
+                            <div class="w-1/3 border-b border-black h-8 relative mx-4 flex items-end justify-center"></div>
+                            <div id="previewEmployeeNameSig" class="w-1/3 text-right">Клюкин С.Н.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ================= FIREBASE INITIALIZATION =================
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnltG-ciUwtpZhFaAhTzLI_cjtVZURgEo",
+            authDomain: "grafiki-aptek.firebaseapp.com",
+            projectId: "grafiki-aptek",
+            storageBucket: "grafiki-aptek.firebasestorage.app",
+            messagingSenderId: "372041187072",
+            appId: "1:372041187072:web:14b4326e85d3f347523de5",
+            measurementId: "G-2KTEGH1MFK",
+            databaseURL: "https://grafiki-aptek-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Firebase wrapper functions
+        async function firebaseGetItem(key) {
+            try {
+                const ref = database.ref('appData/' + key);
+                const snapshot = await ref.once('value');
+                const result = snapshot.exists() ? snapshot.val() : null;
+                return result;
+            } catch (error) {
+                console.error('❌ Firebase getItem error:', error);
+                // Fallback to localStorage
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                } catch (e) {
+                    console.error('❌ localStorage также не работает:', e);
+                    return null;
+                }
+            }
+        }
+
+        // Справочники
+        let employeeReference = [];
+        let pharmacyReference = [];
+
+        // Загрузка справочников
+        async function loadReferences() {
+            try {
+                const refData = await firebaseGetItem('scheduleReferenceData');
+                if (refData) {
+                    const data = typeof refData === 'string' ? JSON.parse(refData) : refData;
+                    employeeReference = data.employeeReference || [];
+                    pharmacyReference = data.pharmacyReference || [];
+                    updateEmployeeSelect();
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки справочников:', e);
+            }
+        }
+
+        // Обновление списка сотрудников в select
+        function updateEmployeeSelect() {
+            const select = document.getElementById('employeeSelect');
+            if (!select) return;
+
+            // Сортируем по имени
+            const sorted = [...employeeReference].sort((a, b) => a.name.localeCompare(b.name));
+
+            select.innerHTML = '<option value="">-- Выберите сотрудника --</option>';
+            sorted.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = emp.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Преобразование ФИО в формат "Фамилия И.О."
+        function formatFIO(fullName) {
+            if (!fullName) return '';
+            
+            // Если уже в формате "Фамилия И.О." (содержит точку после инициала), возвращаем как есть
+            if (fullName.match(/[А-ЯЁ]\.[А-ЯЁ]\./)) {
+                return fullName;
+            }
+            
+            // Разбиваем на части
+            const parts = fullName.trim().split(/\s+/);
+            if (parts.length < 2) return fullName;
+            
+            // Берем фамилию (первая часть)
+            const lastName = parts[0];
+            
+            // Формируем инициалы из остальных частей
+            const initials = parts.slice(1).map(part => {
+                if (part.length > 0) {
+                    return part[0].toUpperCase() + '.';
+                }
+                return '';
+            }).join('');
+            
+            return `${lastName} ${initials}`.trim();
+        }
+
+        // Обработчик выбора сотрудника
+        function onEmployeeSelectChange() {
+            const select = document.getElementById('employeeSelect');
+            const employeeInput = document.getElementById('employeeInput');
+            const employeeTitleInput = document.getElementById('employeeTitleInput');
+            const employeeDepartmentInput = document.getElementById('employeeDepartmentInput');
+
+            if (!select || !select.value) {
+                // Обнуляем поля при очистке выбора
+                if (employeeInput) employeeInput.value = "";
+                if (employeeTitleInput) employeeTitleInput.value = "";
+                if (employeeDepartmentInput) employeeDepartmentInput.value = "";
+                state.employee = "";
+                state.employeeTitle = "";
+                state.employeeDepartment = "";
+                updateDocument();
+                return;
+            }
+
+            const employee = employeeReference.find(e => e.id === select.value);
+            if (employee) {
+                // Преобразуем ФИО в формат "Фамилия И.О."
+                const formattedName = formatFIO(employee.name);
+                
+                // Заполняем ФИО и должность
+                if (employeeInput) employeeInput.value = formattedName;
+                if (employeeTitleInput) employeeTitleInput.value = employee.position || '';
+
+                // Находим аптеку сотрудника
+                let departmentText = '';
+                if (employee.pharmacy && pharmacyReference.length > 0) {
+                    const pharmacy = pharmacyReference.find(p => p.id === employee.pharmacy);
+                    if (pharmacy) {
+                        departmentText = `Аптека №${pharmacy.number}, ${pharmacy.address}`;
+                    }
+                }
+                if (employeeDepartmentInput) employeeDepartmentInput.value = departmentText;
+
+                // Обновляем состояние
+                state.employee = formattedName;
+                state.employeeTitle = employee.position || '';
+                state.employeeDepartment = departmentText;
+
+                // Обновляем документ
+                updateDocument();
+            }
+        }
+
+        const state = {
+            director: "Бочаровой А.В.",
+            directorTitle: "Директор региона Владимир",
+            employee: "",
+            employeeTitle: "",
+            employeeDepartment: "",
+            copyTo: "Клюкин С.Н.",
+            copyTitle: "Территориальный менеджер",
+            reasonText: "Прошу включить компенсацию в заработную плату за расчетный период",
+            comment: "",
+            date: "",
+            outNum: "",
+            amount: 0,
+            hours: 0,
+            valueType: "amount", // "amount" или "hours"
+            periodMonth: 0, // 0-11 (0 = январь, 11 = декабрь)
+            periodYear: 2025,
+            object: "",
+            receipts: []
+        };
+
+        async function fetchGoogleSheetData() {
+            const sheetId = '1KUegEdHb1Cl-AfriiZD7m6hwgTkHxfO5PDRsoDq1Isk';
+            const gid = '0'; 
+            const googleUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(googleUrl)}`;
+            
+            const statusEl = document.getElementById('sheetStatus');
+            const dataList = document.getElementById('objectsList');
+
+            try {
+                const response = await fetch(proxyUrl);
+                if (!response.ok) throw new Error();
+                const text = await response.text();
+                const rows = text.split('\n');
+                if (dataList) dataList.innerHTML = '';
+                let count = 0;
+                rows.forEach(row => {
+                    const matches = row.match(/^"((?:""|[^"])*)"|([^,]*)/);
+                    if (matches) {
+                        let cell = matches[1] ? matches[1].replace(/""/g, '"') : matches[2];
+                        if (cell && cell.trim().length > 0) {
+                            const option = document.createElement('option');
+                            option.value = cell.trim();
+                            if (dataList) dataList.appendChild(option);
+                            count++;
+                        }
+                    }
+                });
+                if (statusEl) {
+                    statusEl.textContent = `Объектов загружено: ${count}`;
+                    statusEl.classList.add('text-green-600');
+                }
+            } catch (e) {
+                if (statusEl) {
+                    statusEl.textContent = 'Ошибка загрузки. Введите данные вручную.';
+                    statusEl.classList.add('text-red-500');
+                }
+            }
+        }
+
+        const numToText = (number) => {
+            if (!number || number === 0) return "________________________";
+            const units = ['', 'один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь', 'девять'];
+            const teens = ['десять', 'одиннадцать', 'двенадцать', 'тринадцать', 'четырнадцать', 'пятнадцать', 'шестнадцать', 'семнадцать', 'восемнадцать', 'девятнадцать'];
+            const tens = ['', '', 'двадцать', 'тридцать', 'сорок', 'пятьдесят', 'шестьдесят', 'семьдесят', 'восемьдесят', 'девяносто'];
+            const hundreds = ['', 'сто', 'двести', 'триста', 'четыреста', 'пятьсот', 'шестьсот', 'семьсот', 'восемьсот', 'девятьсот'];
+
+            const morph = (n, f1, f2, f5) => {
+                n = Math.abs(n) % 100;
+                if (n > 10 && n < 20) return f5;
+                const n1 = n % 10;
+                if (n1 > 1 && n1 < 5) return f2;
+                if (n1 === 1) return f1;
+                return f5;
+            };
+
+            const convertGroup = (n, gender) => {
+                let res = "";
+                const h = Math.floor(n / 100);
+                const t = Math.floor((n % 100) / 10);
+                const u = n % 10;
+                if (h > 0) res += hundreds[h] + " ";
+                if (t === 1) res += teens[u] + " ";
+                else {
+                    if (t > 1) res += tens[t] + " ";
+                    if (u > 0) {
+                        if (gender === 'female' && u === 1) res += "одна ";
+                        else if (gender === 'female' && u === 2) res += "две ";
+                        else if (gender === 'male' && u === 1) res += "один ";
+                        else if (gender === 'male' && u === 2) res += "два ";
+                        else res += units[u] + " ";
+                    }
+                }
+                return res;
+            };
+
+            let rub = Math.floor(number);
+            let kop = Math.round((number - rub) * 100);
+            let text = "";
+            const th = Math.floor(rub / 1000);
+            if (th > 0) {
+                text += convertGroup(th, 'female') + morph(th, "тысяча", "тысячи", "тысяч") + " ";
+                rub %= 1000;
+            }
+            text += convertGroup(rub, 'male');
+            text += morph(Math.floor(number), "рубль", "рубля", "рублей");
+            
+            let kopText = (kop < 10 ? "0" + kop : kop) + " " + morph(kop, "копейка", "копейки", "копеек");
+            return (text + " " + kopText).trim();
+        };
+
+        function setupImageHandling() {
+            const receiptsInput = document.getElementById('receiptsInput');
+            if (receiptsInput) {
+                receiptsInput.addEventListener('change', (e) => {
+                    const files = Array.from(e.target.files);
+                    files.forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            state.receipts.push({ id: Date.now() + Math.random(), dataUrl: ev.target.result });
+                            renderReceiptUI();
+                            renderReceiptPages();
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    receiptsInput.value = '';
+                });
+            }
+        }
+
+        function renderReceiptUI() {
+            const list = document.getElementById('receiptsList');
+            const noMsg = document.getElementById('noReceiptsMsg');
+            if (!list) return;
+            list.innerHTML = '';
+            if (noMsg) noMsg.style.display = state.receipts.length ? 'none' : 'block';
+            state.receipts.forEach((r, idx) => {
+                const div = document.createElement('div');
+                div.className = 'receipt-list-item animate-fade-in';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2"><img src="${r.dataUrl}" class="w-8 h-8 object-cover" style="border: 1px solid #000; border-radius: 0;"><span>Чек №${idx+1}</span></div>
+                    <button onclick="removeReceipt(${r.id})" style="background: repeating-linear-gradient(45deg, #f0f0f0 0px, #f0f0f0 4px, rgba(240, 240, 240, 0.3) 4px, rgba(240, 240, 240, 0.3) 8px); color: #000; border: 1px solid #000; border-radius: 0; font-weight: 600; padding: 4px 8px; cursor: pointer;">✕</button>`;
+                list.appendChild(div);
+            });
+        }
+
+        function renderReceiptPages() {
+            const container = document.getElementById('pagesContainer');
+            const mainPage = document.getElementById('documentPage');
+            if (!container || !mainPage) return;
+            while (mainPage.nextElementSibling) mainPage.nextElementSibling.remove();
+            state.receipts.forEach((r, idx) => {
+                const page = document.createElement('div');
+                page.className = 'a4-page animate-fade-in-up';
+                page.innerHTML = `<div class="receipt-container"><div class="receipt-label">Приложение: Чек №${idx+1}</div><img src="${r.dataUrl}" class="receipt-img"></div>`;
+                container.appendChild(page);
+            });
+        }
+
+        window.removeReceipt = (id) => {
+            state.receipts = state.receipts.filter(r => r.id !== id);
+            renderReceiptUI();
+            renderReceiptPages();
+        };
+
+        function updateDocument() {
+            // Чтение данных из полей
+            const elDirector = document.getElementById('directorInput');
+            const elDirectorTitle = document.getElementById('directorTitleInput');
+            const elEmployee = document.getElementById('employeeInput');
+            const elEmployeeTitle = document.getElementById('employeeTitleInput');
+            const elCopyTo = document.getElementById('copyToInput');
+            const elCopyTitle = document.getElementById('copyTitleInput');
+            const elObject = document.getElementById('objectInput');
+            const elReason = document.getElementById('reasonInput');
+            const elDate = document.getElementById('dateInput');
+            const elEmployeeDepartment = document.getElementById('employeeDepartmentInput');
+            const elValueType = document.getElementById('valueTypeInput');
+            const elAmount = document.getElementById('amountInput');
+            const elHours = document.getElementById('hoursInput');
+            const elPeriodMonth = document.getElementById('periodMonthInput');
+            const elPeriodYear = document.getElementById('periodYearInput');
+            const elComment = document.getElementById('commentInput');
+
+            if (elDirector) state.director = elDirector.value;
+            if (elDirectorTitle) state.directorTitle = elDirectorTitle.value;
+            if (elEmployee) state.employee = elEmployee.value;
+            if (elEmployeeTitle) state.employeeTitle = elEmployeeTitle.value;
+            if (elEmployeeDepartment) state.employeeDepartment = elEmployeeDepartment.value;
+            if (elCopyTo) state.copyTo = elCopyTo.value;
+            if (elCopyTitle) state.copyTitle = elCopyTitle.value;
+            if (elAmount) state.amount = parseFloat(elAmount.value) || 0;
+            if (elHours) state.hours = parseFloat(elHours.value) || 0;
+            if (elValueType) state.valueType = elValueType.value;
+            if (elPeriodMonth !== null) state.periodMonth = parseInt(elPeriodMonth.value) || 11;
+            if (elPeriodYear !== null) state.periodYear = parseInt(elPeriodYear.value) || new Date().getFullYear();
+            if (elObject) state.object = elObject.value;
+            if (elComment) state.comment = elComment.value;
+            if (elDate) state.date = elDate.value;
+
+            // Формирование основания с расчетным периодом
+            const months = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+            const periodText = `${months[state.periodMonth]} ${state.periodYear}`;
+            state.reasonText = `Прошу включить компенсацию в заработную плату за ${periodText}`;
+
+            // Обновление превью
+            const previewIds = {
+                'previewDirectorName': state.director,
+                'previewDirectorTitle': state.directorTitle,
+                'previewEmployeeName': state.employee,
+                'previewEmployeeTitle': state.employeeTitle,
+                'previewEmployeeNameSig': state.employee,
+                'previewEmployeeTitleSig': state.employeeTitle,
+                'previewEmployeeDepartment': state.employeeDepartment || '',
+                'previewCopyTo': state.copyTo,
+                'previewCopyTitle': state.copyTitle,
+                'previewReason': state.reasonText,
+                'previewOutNum': state.outNum
+            };
+
+            for (let id in previewIds) {
+                const el = document.getElementById(id);
+                if (el) el.textContent = previewIds[id];
+            }
+
+            // Объект не используется для компенсации в заработную плату
+
+            const previewDateFull = document.getElementById('previewDateFull');
+            if (previewDateFull) {
+                if (state.date) {
+                    const d = new Date(state.date);
+                    const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+                    previewDateFull.innerHTML = `«${d.getDate()}» ${months[d.getMonth()]} ${d.getFullYear()} г.`;
+                } else {
+                    previewDateFull.innerHTML = `«__» _______ 20__ г.`;
+                }
+            }
+
+            // Переключение между суммой и часами
+            const amountBlock = document.getElementById('previewAmountBlock');
+            const hoursBlock = document.getElementById('previewHoursBlock');
+            const amountTextBlock = document.getElementById('previewAmountTextBlock');
+            const receiptsText = document.getElementById('previewReceiptsText');
+            
+            if (state.valueType === 'hours') {
+                // Показываем часы, скрываем сумму и "Чеки прилагаю"
+                if (amountBlock) amountBlock.classList.add('hidden');
+                if (hoursBlock) hoursBlock.classList.remove('hidden');
+                if (amountTextBlock) amountTextBlock.classList.add('hidden');
+                if (receiptsText) receiptsText.classList.add('hidden');
+                
+                const hoursEl = document.getElementById('previewHoursNum');
+                if (hoursEl) {
+                    if (state.hours > 0) {
+                        hoursEl.textContent = Math.round(state.hours).toLocaleString('ru-RU');
+                    } else {
+                        hoursEl.textContent = "____";
+                    }
+                }
+            } else {
+                // Показываем сумму, скрываем часы, показываем "Чеки прилагаю"
+                if (amountBlock) amountBlock.classList.remove('hidden');
+                if (hoursBlock) hoursBlock.classList.add('hidden');
+                if (amountTextBlock) amountTextBlock.classList.remove('hidden');
+                if (receiptsText) receiptsText.classList.remove('hidden');
+                
+                const amtEl = document.getElementById('previewAmountNum');
+                const amtTxt = document.getElementById('previewAmountText');
+                if (amtEl && amtTxt) {
+                    if (state.amount > 0) {
+                        amtEl.textContent = state.amount.toLocaleString('ru-RU', { minimumFractionDigits: 2 });
+                        amtTxt.textContent = numToText(state.amount);
+                    } else {
+                        amtEl.textContent = "____";
+                        amtTxt.textContent = "________________________";
+                    }
+                }
+            }
+
+            // Обновление комментария
+            const commentEl = document.getElementById('previewComment');
+            if (commentEl) {
+                if (state.comment && state.comment.trim()) {
+                    commentEl.textContent = state.comment.trim();
+                    commentEl.classList.remove('hidden');
+                } else {
+                    commentEl.textContent = '';
+                    commentEl.classList.add('hidden');
+                }
+            }
+        }
+
+        // Инициализация года для периода
+        function initPeriodYear() {
+            const yearSelect = document.getElementById('periodYearInput');
+            if (!yearSelect) return;
+            
+            yearSelect.innerHTML = '';
+            
+            // Добавляем годы с 2025 по 2030
+            for (let year = 2025; year <= 2030; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === state.periodYear) option.selected = true;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        // Переключение между суммой и часами
+        function toggleValueType() {
+            const valueType = document.getElementById('valueTypeInput');
+            const amountContainer = document.getElementById('amountContainer');
+            const hoursContainer = document.getElementById('hoursContainer');
+            
+            if (!valueType) return;
+            
+            valueType.addEventListener('change', (e) => {
+                if (e.target.value === 'hours') {
+                    if (amountContainer) amountContainer.classList.add('hidden');
+                    if (hoursContainer) hoursContainer.classList.remove('hidden');
+                } else {
+                    if (amountContainer) amountContainer.classList.remove('hidden');
+                    if (hoursContainer) hoursContainer.classList.add('hidden');
+                }
+                updateDocument();
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Инициализация полей правильными значениями
+            const elDirector = document.getElementById('directorInput');
+            if (elDirector) elDirector.value = state.director;
+            
+            const elDirectorTitle = document.getElementById('directorTitleInput');
+            if (elDirectorTitle) elDirectorTitle.value = state.directorTitle;
+            
+            const elEmployee = document.getElementById('employeeInput');
+            if (elEmployee) elEmployee.value = state.employee;
+            
+            const elEmployeeTitle = document.getElementById('employeeTitleInput');
+            if (elEmployeeTitle) elEmployeeTitle.value = state.employeeTitle;
+            
+            const elCopyTo = document.getElementById('copyToInput');
+            if (elCopyTo) elCopyTo.value = state.copyTo;
+            
+            const elCopyTitle = document.getElementById('copyTitleInput');
+            if (elCopyTitle) elCopyTitle.value = state.copyTitle;
+            
+            const elDate = document.getElementById('dateInput');
+            if (elDate) elDate.valueAsDate = new Date();
+            
+            const elReason = document.getElementById('reasonInput');
+            if (elReason) elReason.value = state.reasonText;
+            
+            // Обнуление полей при обновлении страницы
+            const elEmployeeSelect = document.getElementById('employeeSelect');
+            if (elEmployeeSelect) elEmployeeSelect.value = "";
+            
+            const elEmployeeDepartment = document.getElementById('employeeDepartmentInput');
+            if (elEmployeeDepartment) elEmployeeDepartment.value = "";
+            
+            const elAmount = document.getElementById('amountInput');
+            if (elAmount) elAmount.value = "";
+            
+            const elHours = document.getElementById('hoursInput');
+            if (elHours) elHours.value = "";
+            
+            const elComment = document.getElementById('commentInput');
+            if (elComment) elComment.value = "";
+            
+            // Инициализация расчетного периода
+            const elPeriodMonth = document.getElementById('periodMonthInput');
+            if (elPeriodMonth) elPeriodMonth.value = state.periodMonth;
+            initPeriodYear();
+            
+            // Инициализация типа значения
+            const elValueType = document.getElementById('valueTypeInput');
+            if (elValueType) elValueType.value = state.valueType;
+            toggleValueType();
+            
+            // Устанавливаем начальное состояние видимости полей
+            const amountContainer = document.getElementById('amountContainer');
+            const hoursContainer = document.getElementById('hoursContainer');
+            if (state.valueType === 'hours') {
+                if (amountContainer) amountContainer.classList.add('hidden');
+                if (hoursContainer) hoursContainer.classList.remove('hidden');
+            } else {
+                if (amountContainer) amountContainer.classList.remove('hidden');
+                if (hoursContainer) hoursContainer.classList.add('hidden');
+            }
+            
+            // Загружаем справочники
+            await loadReferences();
+            
+            // Обработчик выбора сотрудника
+            const employeeSelect = document.getElementById('employeeSelect');
+            if (employeeSelect) {
+                employeeSelect.addEventListener('change', onEmployeeSelectChange);
+            }
+            
+            setupImageHandling();
+            fetchGoogleSheetData();
+
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(i => i.addEventListener('input', updateDocument));
+
+            // Моментальное обновление при изменении расчетного периода
+            const periodMonth = document.getElementById('periodMonthInput');
+            const periodYear = document.getElementById('periodYearInput');
+            if (periodMonth) {
+                periodMonth.addEventListener('change', updateDocument);
+            }
+            if (periodYear) {
+                periodYear.addEventListener('change', updateDocument);
+            }
+
+            updateDocument();
+        });
+    </script>
+</body>
+</html>
