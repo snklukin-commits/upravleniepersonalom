@@ -2233,6 +2233,434 @@
             cursor: pointer; 
         }
 
+        /* Employee Manager Modal Styles */
+        .employee-manager-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+        }
+
+        .employee-manager-modal.active {
+            display: block;
+        }
+
+        .employee-manager-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 0;
+            border: 1px solid #000;
+            width: 95%;
+            max-width: 1400px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .employee-manager-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0 0px,
+                #f0f0f0 4px,
+                rgba(240, 240, 240, 0.3) 4px,
+                rgba(240, 240, 240, 0.3) 8px
+            );
+        }
+
+        .employee-manager-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .employee-manager-close {
+            background: none;
+            border: none;
+            font-size: 32px;
+            color: #000;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .employee-manager-close:hover {
+            opacity: 0.8;
+        }
+
+        .employee-manager-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .employee-manager-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .employee-manager-select-wrapper {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .employee-manager-select-wrapper label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .employee-manager-select-wrapper select,
+        .employee-manager-select-wrapper input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #000;
+            border-radius: 0;
+            font-size: 14px;
+            background: repeating-linear-gradient(
+                45deg,
+                #fafbff 0px,
+                #fafbff 4px,
+                rgba(250, 251, 255, 0.3) 4px,
+                rgba(250, 251, 255, 0.3) 8px
+            );
+            color: #000;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+
+        .employee-manager-select-wrapper select:focus,
+        .employee-manager-select-wrapper input:focus {
+            outline: none;
+            border-color: #000;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+        }
+
+        .employee-manager-info {
+            display: none;
+        }
+
+        .employee-manager-info.active {
+            display: block;
+        }
+
+        .employee-manager-info-card {
+            background: repeating-linear-gradient(
+                45deg,
+                #f8f9ff 0px,
+                #f8f9ff 4px,
+                rgba(248, 249, 255, 0.3) 4px,
+                rgba(248, 249, 255, 0.3) 8px
+            );
+            border: 1px solid #000;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .employee-manager-info-card h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #000;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .employee-manager-info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .employee-manager-info-row:last-child {
+            border-bottom: none;
+        }
+
+        .employee-manager-info-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .employee-manager-info-value {
+            color: #000;
+        }
+
+        .employee-manager-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .employee-manager-stat-card {
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+            border: 1px solid #000;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .employee-manager-stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 5px;
+        }
+
+        .employee-manager-stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .employee-manager-work-section {
+            margin-bottom: 30px;
+        }
+
+        .employee-manager-work-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #000;
+            padding: 10px;
+            background: repeating-linear-gradient(
+                45deg,
+                #e8ecf5 0px,
+                #e8ecf5 4px,
+                rgba(232, 236, 245, 0.3) 4px,
+                rgba(232, 236, 245, 0.3) 8px
+            );
+            border: 1px solid #000;
+        }
+
+        .employee-manager-shifts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .employee-manager-shifts-table th,
+        .employee-manager-shifts-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .employee-manager-shifts-table th {
+            background: repeating-linear-gradient(
+                45deg,
+                #d4f4dd 0px,
+                #d4f4dd 4px,
+                rgba(212, 244, 221, 0.3) 4px,
+                rgba(212, 244, 221, 0.3) 8px
+            );
+            font-weight: 600;
+            color: #000;
+        }
+
+        .employee-manager-shifts-table tr:nth-child(even) {
+            background: repeating-linear-gradient(
+                45deg,
+                #f9f9f9 0px,
+                #f9f9f9 4px,
+                rgba(249, 249, 249, 0.3) 4px,
+                rgba(249, 249, 249, 0.3) 8px
+            );
+        }
+
+        .employee-manager-calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-top: 15px;
+            border: 1px solid #000;
+            background: #fff;
+            padding: 2px;
+        }
+
+        .employee-manager-calendar-header {
+            background: repeating-linear-gradient(
+                45deg,
+                #d4f4dd 0px,
+                #d4f4dd 4px,
+                rgba(212, 244, 221, 0.3) 4px,
+                rgba(212, 244, 221, 0.3) 8px
+            );
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .employee-manager-calendar-day {
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+            border: 1px solid #000;
+            padding: 8px;
+            min-height: 60px;
+            position: relative;
+        }
+
+        .employee-manager-calendar-day.other-month {
+            background: repeating-linear-gradient(
+                45deg,
+                #f5f5f5 0px,
+                #f5f5f5 4px,
+                rgba(245, 245, 245, 0.3) 4px,
+                rgba(245, 245, 245, 0.3) 8px
+            );
+            color: #999;
+        }
+
+        .employee-manager-calendar-day.weekend {
+            background: repeating-linear-gradient(
+                45deg,
+                #fff3e0 0px,
+                #fff3e0 4px,
+                rgba(255, 243, 224, 0.3) 4px,
+                rgba(255, 243, 224, 0.3) 8px
+            );
+        }
+
+        .employee-manager-calendar-day.has-shift {
+            background: repeating-linear-gradient(
+                45deg,
+                #c8e6c9 0px,
+                #c8e6c9 4px,
+                rgba(200, 230, 201, 0.5) 4px,
+                rgba(200, 230, 201, 0.5) 8px
+            );
+            font-weight: 600;
+        }
+
+        .employee-manager-calendar-day.has-subwork {
+            background: repeating-linear-gradient(
+                45deg,
+                #bbdefb 0px,
+                #bbdefb 4px,
+                rgba(187, 222, 251, 0.5) 4px,
+                rgba(187, 222, 251, 0.5) 8px
+            );
+            font-weight: 600;
+        }
+
+        .employee-manager-calendar-day.has-shift.has-subwork {
+            background: repeating-linear-gradient(
+                45deg,
+                #b2dfdb 0px,
+                #b2dfdb 4px,
+                rgba(178, 223, 219, 0.5) 4px,
+                rgba(178, 223, 219, 0.5) 8px
+            );
+        }
+
+        .employee-manager-calendar-day.has-absence {
+            background: repeating-linear-gradient(
+                45deg,
+                #fff3e0 0px,
+                #fff3e0 4px,
+                rgba(255, 243, 224, 0.3) 4px,
+                rgba(255, 243, 224, 0.3) 8px
+            );
+        }
+
+        .employee-manager-calendar-day.has-shift.has-absence {
+            background: repeating-linear-gradient(
+                45deg,
+                #ffe0b2 0px,
+                #ffe0b2 4px,
+                rgba(255, 224, 178, 0.3) 4px,
+                rgba(255, 224, 178, 0.3) 8px
+            );
+        }
+
+        .employee-manager-calendar-day-absence {
+            font-size: 10px;
+            color: #e65100;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .employee-manager-calendar-day-number {
+            font-size: 14px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .employee-manager-calendar-day-shift {
+            font-size: 11px;
+            color: #333;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .employee-manager-calendar-day-time {
+            font-size: 10px;
+            color: #555;
+        }
+
+        .employee-manager-loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .employee-manager-empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .employee-manager-compensation-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .employee-manager-compensation-row:hover {
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0 0px,
+                #f0f0f0 4px,
+                rgba(240, 240, 240, 0.3) 4px,
+                rgba(240, 240, 240, 0.3) 8px
+            );
+        }
+
         .header-row {
             display: flex;
             flex-wrap: wrap;
@@ -7521,6 +7949,112 @@ function getDisplayValue(employee, day) {
             <button class="sidebar-btn sidebar-btn-print" onclick="window.open('https://snklukin-commits.github.io/upravleniepersonalom/sz.html', '_blank'); closeSidebar();">📝 Служебная записка</button>
             <button class="sidebar-btn sidebar-btn-print" onclick="window.open('https://snklukin-commits.github.io/upravleniepersonalom/zayavleniya.html', '_blank'); closeSidebar();">📄 Заявления</button>
         </div>
+        <div class="ref-section" style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 15px;">
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 10px; color: #333;">Менеджмент</div>
+            <button class="sidebar-btn sidebar-btn-print" onclick="openEmployeeManagerModal(); closeSidebar();">👤 Данные по сотрудникам</button>
+        </div>
+    </div>
+</div>
+
+<!-- EMPLOYEE MANAGER MODAL -->
+<div id="employeeManagerModal" class="employee-manager-modal" onclick="closeEmployeeManagerModal(event)">
+    <div class="employee-manager-content" onclick="event.stopPropagation()">
+        <div class="employee-manager-header">
+            <div class="employee-manager-title">МЕНЕДЖЕР РАБОТЫ СОТРУДНИКОВ</div>
+            <button class="employee-manager-close" onclick="closeEmployeeManagerModal()">✕</button>
+        </div>
+        <div class="employee-manager-body">
+            <div class="employee-manager-controls">
+                <div class="employee-manager-select-wrapper">
+                    <label>Выберите сотрудника:</label>
+                    <select id="employeeManagerSelect">
+                        <option value="">-- Выберите сотрудника --</option>
+                    </select>
+                </div>
+                <div class="employee-manager-select-wrapper">
+                    <label>Месяц:</label>
+                    <select id="employeeManagerMonthSelect">
+                        <option value="0">Январь</option>
+                        <option value="1">Февраль</option>
+                        <option value="2">Март</option>
+                        <option value="3">Апрель</option>
+                        <option value="4">Май</option>
+                        <option value="5">Июнь</option>
+                        <option value="6">Июль</option>
+                        <option value="7">Август</option>
+                        <option value="8">Сентябрь</option>
+                        <option value="9">Октябрь</option>
+                        <option value="10">Ноябрь</option>
+                        <option value="11">Декабрь</option>
+                    </select>
+                </div>
+                <div class="employee-manager-select-wrapper">
+                    <label>Год:</label>
+                    <input type="number" id="employeeManagerYearSelect" value="2025" min="2020" max="2030">
+                </div>
+            </div>
+            
+            <div id="employeeManagerInfo" class="employee-manager-info">
+                <div class="employee-manager-info-card">
+                    <h2>Основная информация</h2>
+                    <div class="employee-manager-info-row">
+                        <span class="employee-manager-info-label">ФИО:</span>
+                        <span class="employee-manager-info-value" id="empManagerName">-</span>
+                    </div>
+                    <div class="employee-manager-info-row">
+                        <span class="employee-manager-info-label">Должность:</span>
+                        <span class="employee-manager-info-value" id="empManagerPosition">-</span>
+                    </div>
+                    <div class="employee-manager-info-row">
+                        <span class="employee-manager-info-label">Основная аптека:</span>
+                        <span class="employee-manager-info-value" id="empManagerPharmacy">-</span>
+                    </div>
+                    <div class="employee-manager-info-row">
+                        <span class="employee-manager-info-label">Период:</span>
+                        <span class="employee-manager-info-value" id="empManagerPeriod">-</span>
+                    </div>
+                </div>
+                
+                <div class="employee-manager-stats-grid">
+                    <div class="employee-manager-stat-card">
+                        <div class="employee-manager-stat-value" id="totalManagerShifts">0</div>
+                        <div class="employee-manager-stat-label">Всего смен</div>
+                    </div>
+                    <div class="employee-manager-stat-card">
+                        <div class="employee-manager-stat-value" id="mainManagerShifts">0</div>
+                        <div class="employee-manager-stat-label">Смен на основной работе</div>
+                        <div class="employee-manager-stat-label" style="font-size: 12px; margin-top: 5px; color: #666;" id="mainManagerHours">0 часов</div>
+                    </div>
+                    <div class="employee-manager-stat-card">
+                        <div class="employee-manager-stat-value" id="subManagerShifts">0</div>
+                        <div class="employee-manager-stat-label">Подработки</div>
+                        <div class="employee-manager-stat-label" style="font-size: 12px; margin-top: 5px; color: #666;" id="subManagerHours">0 часов</div>
+                    </div>
+                </div>
+                
+                <div class="employee-manager-work-section">
+                    <div id="mainManagerWorkContent"></div>
+                </div>
+                
+                <div class="employee-manager-work-section">
+                    <h3>💰 Компенсация в заработную плату</h3>
+                    <div id="compensationManagerContent"></div>
+                </div>
+                
+                <div class="employee-manager-work-section">
+                    <h3>🏥 Больничные и отпуска</h3>
+                    <div id="absenceManagerContent"></div>
+                </div>
+            </div>
+
+            <div id="employeeManagerLoadingState" class="employee-manager-loading" style="display: none;">
+                Загрузка данных...
+            </div>
+            
+            <div id="employeeManagerEmptyState" class="employee-manager-empty-state">
+                Выберите сотрудника для просмотра информации
+            </div>
+        </div>
     </div>
 </div>
 
@@ -8677,6 +9211,753 @@ document.addEventListener('keydown', function(e) {
             if (printBtn) printBtn.style.display = 'none';
         }
     }
+
+    // ===== EMPLOYEE MANAGER MODAL FUNCTIONS =====
+    let employeeManagerData = {
+        allEmployees: {},
+        absenceData: {},
+        compensationData: {},
+        currentMonth: null,
+        currentYear: null
+    };
+
+    // Функция для безопасного кодирования ключей Firebase
+    function encodeFirebaseKeyEmployeeManager(key) {
+        return String(key)
+            .replace(/\./g, '_DOT_')
+            .replace(/#/g, '_HASH_')
+            .replace(/\$/g, '_DOLLAR_')
+            .replace(/\//g, '_SLASH_')
+            .replace(/\[/g, '_LBRACKET_')
+            .replace(/\]/g, '_RBRACKET_');
+    }
+
+    // Функция для декодирования ключей Firebase
+    function decodeFirebaseKeyEmployeeManager(key) {
+        return String(key)
+            .replace(/_DOT_/g, '.')
+            .replace(/_HASH_/g, '#')
+            .replace(/_DOLLAR_/g, '$')
+            .replace(/_SLASH_/g, '/')
+            .replace(/_LBRACKET_/g, '[')
+            .replace(/_RBRACKET_/g, ']');
+    }
+
+    function openEmployeeManagerModal() {
+        const modal = document.getElementById('employeeManagerModal');
+        if (!modal) return;
+        
+        // Устанавливаем текущий месяц и год из основного графика
+        employeeManagerData.currentMonth = currentMonth;
+        employeeManagerData.currentYear = currentYear;
+        
+        // Обновляем селекторы месяца и года
+        const monthSelect = document.getElementById('employeeManagerMonthSelect');
+        const yearSelect = document.getElementById('employeeManagerYearSelect');
+        if (monthSelect) monthSelect.value = currentMonth;
+        if (yearSelect) yearSelect.value = currentYear;
+        
+        modal.classList.add('active');
+        loadEmployeeManagerData();
+    }
+
+    function closeEmployeeManagerModal(event) {
+        if (event && event.target !== event.currentTarget && !event.target.closest('.employee-manager-content')) {
+            return;
+        }
+        const modal = document.getElementById('employeeManagerModal');
+        if (modal) {
+            modal.classList.remove('active');
+        }
+    }
+
+    async function loadEmployeeManagerData() {
+        const loadingEl = document.getElementById('employeeManagerLoadingState');
+        const emptyEl = document.getElementById('employeeManagerEmptyState');
+        const infoEl = document.getElementById('employeeManagerInfo');
+        
+        if (loadingEl) loadingEl.style.display = 'block';
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (infoEl) infoEl.classList.remove('active');
+        
+        try {
+            // Проверяем, что аптека выбрана
+            if (!currentPharmacyId || currentPharmacyId === '--') {
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (emptyEl) {
+                    emptyEl.style.display = 'block';
+                    emptyEl.textContent = 'Выберите аптеку в основном графике для просмотра данных по сотрудникам.';
+                }
+                return;
+            }
+            
+            // Загружаем данные об отсутствиях
+            const absenceDataRaw = await firebaseGetItem('absenceData');
+            employeeManagerData.absenceData = absenceDataRaw ? (typeof absenceDataRaw === 'string' ? JSON.parse(absenceDataRaw) : absenceDataRaw) : {};
+            
+            // Загружаем данные о компенсациях
+            const compensationDataRaw = await firebaseGetItem('compensationData');
+            const rawData = compensationDataRaw ? (typeof compensationDataRaw === 'string' ? JSON.parse(compensationDataRaw) : compensationDataRaw) : {};
+            employeeManagerData.compensationData = {};
+            if (rawData && typeof rawData === 'object') {
+                for (const safeKey in rawData) {
+                    const originalKey = decodeFirebaseKeyEmployeeManager(safeKey);
+                    employeeManagerData.compensationData[originalKey] = rawData[safeKey];
+                }
+            }
+            
+            // Загружаем данные сотрудников для выбранного месяца/года (только текущей аптеки)
+            await loadEmployeeManagerEmployees();
+            
+            populateEmployeeManagerSelect();
+            
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (Object.keys(employeeManagerData.allEmployees).length === 0) {
+                if (emptyEl) {
+                    emptyEl.style.display = 'block';
+                    emptyEl.textContent = 'Нет данных о сотрудниках выбранной аптеки за выбранный месяц. Попробуйте выбрать другой месяц.';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading employee manager data:', error);
+            if (loadingEl) loadingEl.style.display = 'none';
+            if (emptyEl) {
+                emptyEl.style.display = 'block';
+                emptyEl.textContent = 'Ошибка загрузки данных: ' + error.message;
+            }
+        }
+    }
+
+    async function loadEmployeeManagerEmployees() {
+        employeeManagerData.allEmployees = {};
+        
+        // Получаем месяц и год из селекторов
+        const monthSelect = document.getElementById('employeeManagerMonthSelect');
+        const yearSelect = document.getElementById('employeeManagerYearSelect');
+        const month = monthSelect ? parseInt(monthSelect.value) : employeeManagerData.currentMonth;
+        const year = yearSelect ? parseInt(yearSelect.value) : employeeManagerData.currentYear;
+        
+        employeeManagerData.currentMonth = month;
+        employeeManagerData.currentYear = year;
+        
+        // Загружаем данные только для текущей аптеки
+        if (!currentPharmacyId || currentPharmacyId === '--' || !pharmacyReference || pharmacyReference.length === 0) {
+            return;
+        }
+        
+        // Находим текущую аптеку
+        const currentPharmacy = pharmacyReference.find(p => {
+            const pId = String(p.id || '');
+            const pNumber = String(p.number || '');
+            const currentId = String(currentPharmacyId);
+            return pId === currentId || pNumber === currentId;
+        });
+        
+        if (!currentPharmacy) {
+            console.warn('Текущая аптека не найдена:', currentPharmacyId);
+            return;
+        }
+        
+        const pharmacyId = currentPharmacy.id || currentPharmacy.number;
+        const key = getScheduleKey(year, month, pharmacyId);
+        const data = await firebaseGetItem(key);
+        
+        if (data) {
+            const scheduleData = typeof data === 'string' ? JSON.parse(data) : data;
+            if (scheduleData && scheduleData.employees) {
+                const employees = Array.isArray(scheduleData.employees) ? scheduleData.employees : [];
+                employees.forEach(emp => {
+                    if (!emp.name) return;
+                    
+                    // Фильтруем только основных сотрудников (не подработчиков)
+                    const isSubcontractor = emp.isSubcontractor === true || 
+                                           emp.isSubcontractor === 1 || 
+                                           emp.isSubcontractor === 'true' || 
+                                           emp.isSubcontractor === '1';
+                    if (isSubcontractor) return; // Пропускаем подработчиков
+                    
+                    if (!employeeManagerData.allEmployees[emp.name]) {
+                        employeeManagerData.allEmployees[emp.name] = [];
+                    }
+                    
+                    const employeeRecord = {
+                        ...emp,
+                        pharmacyId: pharmacyId,
+                        pharmacyNumber: currentPharmacy.number,
+                        pharmacyName: `Аптека №${currentPharmacy.number}`,
+                        isMain: !isSubcontractor
+                    };
+                    
+                    employeeManagerData.allEmployees[emp.name].push(employeeRecord);
+                });
+            }
+        }
+    }
+
+    function populateEmployeeManagerSelect() {
+        const select = document.getElementById('employeeManagerSelect');
+        if (!select) return;
+        
+        const names = Object.keys(employeeManagerData.allEmployees).sort();
+        
+        // Очищаем существующие опции кроме первой
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+        
+        names.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            select.appendChild(option);
+        });
+    }
+
+    function displayEmployeeManagerInfo() {
+        const employeeName = document.getElementById('employeeManagerSelect').value;
+        const infoEl = document.getElementById('employeeManagerInfo');
+        const emptyEl = document.getElementById('employeeManagerEmptyState');
+        
+        if (!employeeName || !employeeManagerData.allEmployees[employeeName]) {
+            if (infoEl) infoEl.classList.remove('active');
+            if (emptyEl) emptyEl.style.display = 'block';
+            return;
+        }
+
+        if (emptyEl) emptyEl.style.display = 'none';
+        if (infoEl) infoEl.classList.add('active');
+
+        const employeeData = employeeManagerData.allEmployees[employeeName];
+        
+        // Находим основную работу (используем логику из EmployeeManager.html)
+        let mainPharmacyId = null;
+        const employeeRef = employeeReference.find(e => e.name === employeeName);
+        if (employeeRef && employeeRef.pharmacy) {
+            mainPharmacyId = String(employeeRef.pharmacy);
+        }
+        
+        let mainWork;
+        if (mainPharmacyId) {
+            mainWork = employeeData.find(e => {
+                const empPharmacyId = String(e.pharmacyId || '');
+                const empPharmacyNumber = String(e.pharmacyNumber || '');
+                const mainPharmIdStr = String(mainPharmacyId);
+                return empPharmacyId === mainPharmIdStr || empPharmacyNumber === mainPharmIdStr;
+            });
+        }
+        if (!mainWork) {
+            mainWork = employeeData.find(e => e.isMain === true);
+        }
+        if (!mainWork && employeeData.length > 0) {
+            mainWork = employeeData[0];
+        }
+        
+        if (!mainWork) {
+            if (infoEl) infoEl.classList.remove('active');
+            if (emptyEl) emptyEl.style.display = 'block';
+            return;
+        }
+        
+        // Отображаем основную информацию
+        const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
+                          'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+        document.getElementById('empManagerName').textContent = employeeName;
+        document.getElementById('empManagerPosition').textContent = mainWork.position || '-';
+        document.getElementById('empManagerPharmacy').textContent = mainWork.pharmacyName || '-';
+        document.getElementById('empManagerPeriod').textContent = `${monthNames[employeeManagerData.currentMonth]} ${employeeManagerData.currentYear}`;
+
+        // Рассчитываем статистику (упрощенная версия, используя функции из EmployeeManager.html)
+        const mainStats = calculateEmployeeManagerStats(mainWork, employeeManagerData.currentMonth, employeeManagerData.currentYear);
+        
+        // Фильтруем подработки
+        const subWorks = employeeData.filter(e => e !== mainWork && 
+                                                   !(e.pharmacyId === mainWork.pharmacyId && e.pharmacyNumber === mainWork.pharmacyNumber));
+        
+        let totalShifts = mainStats.totalShifts;
+        let mainShifts = mainStats.totalShifts;
+        let subShifts = 0;
+        let subHours = 0;
+        
+        subWorks.forEach(sub => {
+            const subStats = calculateEmployeeManagerStats(sub, employeeManagerData.currentMonth, employeeManagerData.currentYear);
+            totalShifts += subStats.totalShifts;
+            subShifts += subStats.totalShifts;
+            subHours += subStats.totalHours;
+        });
+
+        document.getElementById('totalManagerShifts').textContent = totalShifts;
+        document.getElementById('mainManagerShifts').textContent = mainShifts;
+        document.getElementById('mainManagerHours').textContent = mainStats.totalHours + ' часов';
+        document.getElementById('subManagerShifts').textContent = subShifts;
+        document.getElementById('subManagerHours').textContent = subHours + ' часов';
+
+        // Отображаем календарь и другие данные
+        displayEmployeeManagerCalendar(mainWork, mainStats, subWorks, employeeName);
+        displayEmployeeManagerCompensation(employeeName);
+        displayEmployeeManagerAbsences(employeeName);
+    }
+
+    function calculateEmployeeManagerStats(employee, month, year) {
+        if (!employee) {
+            return { totalShifts: 0, totalHours: 0, shifts: [] };
+        }
+        
+        const daysInMonth = getDaysInMonth(month, year);
+        let totalShifts = 0;
+        let totalHours = 0;
+        const shifts = [];
+
+        // Проверяем dayOverrides
+        if (employee.dayOverrides && typeof employee.dayOverrides === 'object') {
+            for (let day = 1; day <= daysInMonth; day++) {
+                const absence = getAbsenceForEmployeeManager(employee.name, day, month, year);
+                if (absence) continue;
+                
+                let override = employee.dayOverrides[day];
+                if (!override && employee.dayOverrides[String(day)]) override = employee.dayOverrides[String(day)];
+                
+                if (override && override !== '' && override !== null && override !== undefined) {
+                    const shift = parseShiftEmployeeManager(override);
+                    if (shift) {
+                        totalShifts++;
+                        totalHours += shift.hours;
+                        shifts.push({
+                            day,
+                            start: shift.start,
+                            end: shift.end,
+                            hours: shift.hours,
+                            type: 'override',
+                            pharmacyId: employee.pharmacyId
+                        });
+                    }
+                }
+            }
+        }
+
+        // Проверяем стандартное расписание
+        if (employee.schedule && employee.schedule !== '') {
+            const schedulePattern = employee.schedule.match(/^(\d+)\/(\d+)$/);
+            
+            if (schedulePattern) {
+                const workDays = parseInt(schedulePattern[1]);
+                const restDays = parseInt(schedulePattern[2]);
+                const cycleLength = workDays + restDays;
+                const startDay = employee.scheduleStartDay || 1;
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const absence = getAbsenceForEmployeeManager(employee.name, day, month, year);
+                    if (absence) continue;
+                    
+                    if (employee.dayOverrides && employee.dayOverrides[day] && employee.dayOverrides[day] !== '') {
+                        continue;
+                    }
+                    
+                    const dayInCycle = ((day - startDay) % cycleLength + cycleLength) % cycleLength;
+                    const shouldWork = dayInCycle < workDays;
+                    
+                    if (shouldWork && employee.startHour && employee.endHour) {
+                        const shift = parseShiftEmployeeManager(`${employee.startHour}-${employee.endHour}`);
+                        if (shift) {
+                            totalShifts++;
+                            totalHours += shift.hours;
+                            shifts.push({
+                                day,
+                                start: shift.start,
+                                end: shift.end,
+                                hours: shift.hours,
+                                type: 'schedule',
+                                pharmacyId: employee.pharmacyId
+                            });
+                        }
+                    }
+                }
+            } else {
+                const trimmedSchedule = employee.schedule.trim();
+                let scheduleDays = [];
+                if (/^\d+$/.test(trimmedSchedule)) {
+                    scheduleDays = [parseInt(trimmedSchedule)];
+                } else {
+                    scheduleDays = employee.schedule.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
+                }
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const absence = getAbsenceForEmployeeManager(employee.name, day, month, year);
+                    if (absence) continue;
+                    
+                    if (employee.dayOverrides && employee.dayOverrides[day] && employee.dayOverrides[day] !== '') {
+                        continue;
+                    }
+                    
+                    const date = new Date(year, month, day);
+                    let dayOfWeekNum = date.getDay();
+                    dayOfWeekNum = dayOfWeekNum === 0 ? 6 : dayOfWeekNum - 1;
+                    const shouldWork = scheduleDays.includes(dayOfWeekNum);
+                    
+                    if (shouldWork && employee.startHour && employee.endHour) {
+                        const shift = parseShiftEmployeeManager(`${employee.startHour}-${employee.endHour}`);
+                        if (shift) {
+                            totalShifts++;
+                            totalHours += shift.hours;
+                            shifts.push({
+                                day,
+                                start: shift.start,
+                                end: shift.end,
+                                hours: shift.hours,
+                                type: 'schedule',
+                                pharmacyId: employee.pharmacyId
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        return { totalShifts, totalHours, shifts };
+    }
+
+    function parseShiftEmployeeManager(shiftValue) {
+        if (!shiftValue || shiftValue === '') return null;
+        const match = shiftValue.match(/(\d+)-(\d+)/);
+        if (match) {
+            const start = parseInt(match[1]);
+            const end = parseInt(match[2]);
+            let hours = end - start - 1;
+            if (hours < 0) hours += 24;
+            return { start, end, hours };
+        }
+        return null;
+    }
+
+    function getAbsenceForEmployeeManager(employeeName, day, month, year) {
+        if (!employeeManagerData.absenceData || !employeeManagerData.absenceData[employeeName]) return null;
+        
+        const checkDate = new Date(year, month, day);
+        for (let absence of employeeManagerData.absenceData[employeeName]) {
+            const startDate = new Date(absence.startDate);
+            const endDate = new Date(absence.endDate);
+            if (checkDate >= startDate && checkDate <= endDate) {
+                return {
+                    type: absence.type,
+                    startDate: absence.startDate,
+                    endDate: absence.endDate
+                };
+            }
+        }
+        return null;
+    }
+
+    function displayEmployeeManagerCalendar(mainWork, mainStats, subWorks, employeeName) {
+        const container = document.getElementById('mainManagerWorkContent');
+        if (!container) return;
+        
+        const daysInMonth = getDaysInMonth(employeeManagerData.currentMonth, employeeManagerData.currentYear);
+        
+        // Собираем все смены
+        const allShifts = [];
+        mainStats.shifts.forEach(shift => {
+            allShifts.push({
+                ...shift,
+                isMain: true,
+                pharmacyName: mainWork.pharmacyName,
+                pharmacyNumber: mainWork.pharmacyNumber
+            });
+        });
+        
+        subWorks.forEach(sub => {
+            const subStats = calculateEmployeeManagerStats(sub, employeeManagerData.currentMonth, employeeManagerData.currentYear);
+            subStats.shifts.forEach(shift => {
+                allShifts.push({
+                    ...shift,
+                    isMain: false,
+                    pharmacyName: sub.pharmacyName,
+                    pharmacyNumber: sub.pharmacyNumber
+                });
+            });
+        });
+        
+        // Получаем отсутствия
+        const absencesMap = {};
+        if (employeeManagerData.absenceData && employeeManagerData.absenceData[employeeName]) {
+            const absences = employeeManagerData.absenceData[employeeName];
+            const currentMonthStart = new Date(employeeManagerData.currentYear, employeeManagerData.currentMonth, 1);
+            const currentMonthEnd = new Date(employeeManagerData.currentYear, employeeManagerData.currentMonth + 1, 0);
+            
+            absences.forEach(absence => {
+                const startDate = new Date(absence.startDate);
+                const endDate = new Date(absence.endDate);
+                
+                if (startDate <= currentMonthEnd && endDate >= currentMonthStart) {
+                    for (let d = new Date(Math.max(startDate, currentMonthStart)); 
+                         d <= Math.min(endDate, currentMonthEnd); 
+                         d.setDate(d.getDate() + 1)) {
+                        if (d.getMonth() === employeeManagerData.currentMonth && d.getFullYear() === employeeManagerData.currentYear) {
+                            const day = d.getDate();
+                            if (!absencesMap[day]) {
+                                absencesMap[day] = [];
+                            }
+                            absencesMap[day].push(absence.type);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Создаем календарь
+        let html = '<h3 style="font-size: 18px; margin-bottom: 15px; color: #000; padding: 10px; background: repeating-linear-gradient(45deg, #e8ecf5 0px, #e8ecf5 4px, rgba(232, 236, 245, 0.3) 4px, rgba(232, 236, 245, 0.3) 8px); border: 1px solid #000;">📅 Календарь смен</h3>';
+        html += '<div class="employee-manager-calendar">';
+        
+        const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+        weekDays.forEach(day => {
+            html += `<div class="employee-manager-calendar-header">${day}</div>`;
+        });
+        
+        const shiftsMap = {};
+        allShifts.forEach(shift => {
+            if (!shiftsMap[shift.day]) {
+                shiftsMap[shift.day] = [];
+            }
+            shiftsMap[shift.day].push(shift);
+        });
+        
+        const firstDay = new Date(employeeManagerData.currentYear, employeeManagerData.currentMonth, 1);
+        let firstDayOfWeek = firstDay.getDay();
+        firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+        
+        for (let i = 0; i < firstDayOfWeek; i++) {
+            html += '<div class="employee-manager-calendar-day other-month"></div>';
+        }
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(employeeManagerData.currentYear, employeeManagerData.currentMonth, day);
+            const dayOfWeek = date.getDay();
+            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+            const dayShifts = shiftsMap[day] || [];
+            const dayAbsences = absencesMap[day] || [];
+            const hasMainShift = dayShifts.some(s => s.isMain);
+            const hasSubwork = dayShifts.some(s => !s.isMain);
+            const hasAnyShift = dayShifts.length > 0;
+            const hasAbsence = dayAbsences.length > 0;
+            
+            let dayClass = 'employee-manager-calendar-day';
+            if (isWeekend) dayClass += ' weekend';
+            if (hasMainShift) dayClass += ' has-shift';
+            if (hasSubwork) dayClass += ' has-subwork';
+            if (hasAbsence) dayClass += ' has-absence';
+            
+            html += `<div class="${dayClass}">`;
+            html += `<div class="employee-manager-calendar-day-number">${day}</div>`;
+            
+            if (hasAbsence) {
+                dayAbsences.forEach(absenceType => {
+                    const absenceText = absenceType === 'vacation' ? 'Отпуск' : 'Больничный';
+                    html += `<div class="employee-manager-calendar-day-absence">${absenceText}</div>`;
+                });
+            }
+            
+            if (hasAnyShift) {
+                dayShifts.forEach(shift => {
+                    const timeRange = `${String(shift.start).padStart(2, '0')}:00-${String(shift.end).padStart(2, '0')}:00`;
+                    const shiftLabel = shift.isMain ? 'Смена' : `№${shift.pharmacyNumber}`;
+                    html += `<div class="employee-manager-calendar-day-shift">${shiftLabel}</div>`;
+                    html += `<div class="employee-manager-calendar-day-time">${timeRange}</div>`;
+                    html += `<div class="employee-manager-calendar-day-time">${shift.hours} ч</div>`;
+                });
+            }
+            
+            html += '</div>';
+        }
+        
+        const lastDay = new Date(employeeManagerData.currentYear, employeeManagerData.currentMonth, daysInMonth);
+        let lastDayOfWeek = lastDay.getDay();
+        lastDayOfWeek = lastDayOfWeek === 0 ? 6 : lastDayOfWeek - 1;
+        const remainingDays = 6 - lastDayOfWeek;
+        for (let i = 0; i < remainingDays; i++) {
+            html += '<div class="employee-manager-calendar-day other-month"></div>';
+        }
+        
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function displayEmployeeManagerCompensation(employeeName) {
+        const container = document.getElementById('compensationManagerContent');
+        if (!container) return;
+        
+        let foundData = employeeManagerData.compensationData && employeeManagerData.compensationData[employeeName];
+        let actualEmployeeKey = employeeName;
+        
+        if (!foundData) {
+            const shortName = formatFIOEmployeeManager(employeeName);
+            if (employeeManagerData.compensationData && employeeManagerData.compensationData[shortName]) {
+                foundData = employeeManagerData.compensationData[shortName];
+                actualEmployeeKey = shortName;
+            } else {
+                container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Нет данных о компенсациях</p>';
+                return;
+            }
+        }
+        
+        employeeName = actualEmployeeKey;
+        const employeeCompensations = employeeManagerData.compensationData[employeeName];
+        const periodKey = `${employeeManagerData.currentYear}_${employeeManagerData.currentMonth}`;
+        let currentCompensations = employeeCompensations[periodKey] || [];
+        
+        if (currentCompensations.length === 0) {
+            container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Нет компенсаций в выбранном месяце</p>';
+            return;
+        }
+        
+        let html = `
+            <table class="employee-manager-shifts-table">
+                <thead>
+                    <tr>
+                        <th>Сумма / Время</th>
+                        <th>Комментарий</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        currentCompensations.forEach((comp, index) => {
+            const valueTypeDisplay = comp.valueType === 'hours' ? 'часов' : 'руб.';
+            const valueText = comp.valueType === 'hours' 
+                ? `${comp.value} ${valueTypeDisplay}` 
+                : `${comp.value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ${valueTypeDisplay}`;
+            const commentText = comp.comment || '';
+            
+            html += `
+                <tr>
+                    <td>${valueText}</td>
+                    <td>${commentText}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                </tbody>
+            </table>
+        `;
+        
+        container.innerHTML = html;
+    }
+
+    function displayEmployeeManagerAbsences(employeeName) {
+        const container = document.getElementById('absenceManagerContent');
+        if (!container) return;
+        
+        if (!employeeManagerData.absenceData || !employeeManagerData.absenceData[employeeName] || employeeManagerData.absenceData[employeeName].length === 0) {
+            container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Нет больничных и отпусков</p>';
+            return;
+        }
+        
+        const absences = employeeManagerData.absenceData[employeeName];
+        const currentAbsences = absences.filter(absence => {
+            const startDate = new Date(absence.startDate);
+            const endDate = new Date(absence.endDate);
+            const currentMonthStart = new Date(employeeManagerData.currentYear, employeeManagerData.currentMonth, 1);
+            const currentMonthEnd = new Date(employeeManagerData.currentYear, employeeManagerData.currentMonth + 1, 0);
+            return (startDate <= currentMonthEnd && endDate >= currentMonthStart);
+        });
+        
+        if (currentAbsences.length === 0) {
+            container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Нет больничных и отпусков в выбранном месяце</p>';
+            return;
+        }
+        
+        function formatDate(date) {
+            const d = new Date(date);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+        
+        function calculateDays(startDate, endDate) {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            return diffDays;
+        }
+        
+        let html = `
+            <table class="employee-manager-shifts-table">
+                <thead>
+                    <tr>
+                        <th>Тип</th>
+                        <th>Период</th>
+                        <th>Количество дней</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        currentAbsences.forEach(absence => {
+            const startDate = new Date(absence.startDate);
+            const endDate = new Date(absence.endDate);
+            const typeName = absence.type === 'vacation' ? 'Отпуск' : 'Больничный';
+            const totalDays = calculateDays(startDate, endDate);
+            
+            html += `
+                <tr>
+                    <td>${typeName}</td>
+                    <td>${formatDate(startDate)} - ${formatDate(endDate)}</td>
+                    <td>${totalDays}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+                </tbody>
+            </table>
+        `;
+        
+        container.innerHTML = html;
+    }
+
+    function formatFIOEmployeeManager(fullName) {
+        if (!fullName) return '';
+        if (fullName.match(/[А-ЯЁ]\.[А-ЯЁ]\./)) {
+            return fullName;
+        }
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length < 2) return fullName;
+        const lastName = parts[0];
+        const initials = parts.slice(1).map(part => {
+            if (part.length > 0) {
+                return part[0].toUpperCase() + '.';
+            }
+            return '';
+        }).join('');
+        return `${lastName} ${initials}`.trim();
+    }
+
+    // Event listeners для менеджера сотрудников
+    document.addEventListener('DOMContentLoaded', function() {
+        const employeeSelect = document.getElementById('employeeManagerSelect');
+        const monthSelect = document.getElementById('employeeManagerMonthSelect');
+        const yearSelect = document.getElementById('employeeManagerYearSelect');
+        
+        if (employeeSelect) {
+            employeeSelect.addEventListener('change', displayEmployeeManagerInfo);
+        }
+        if (monthSelect) {
+            monthSelect.addEventListener('change', function() {
+                loadEmployeeManagerEmployees().then(() => {
+                    populateEmployeeManagerSelect();
+                    displayEmployeeManagerInfo();
+                });
+            });
+        }
+        if (yearSelect) {
+            yearSelect.addEventListener('change', function() {
+                loadEmployeeManagerEmployees().then(() => {
+                    populateEmployeeManagerSelect();
+                    displayEmployeeManagerInfo();
+                });
+            });
+        }
+    });
 
     async function generatePayrollJournalFromForm() {
         const issueDateInput = document.getElementById('payrollIssueDate');
