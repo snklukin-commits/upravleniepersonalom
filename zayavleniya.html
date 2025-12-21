@@ -1,0 +1,1096 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Заявления | Аптечная сеть «Алоэ»</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: white;
+      color: #000;
+      min-height: 100vh;
+      padding: 20px;
+      zoom: 0.85;
+      transform-origin: top left;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      animation: fadeInUp 0.8s ease;
+    }
+
+    .form-panel {
+      background-color: white;
+      border-radius: 0;
+      padding: 15px;
+      box-shadow: none;
+      border: 1px solid #000;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+      width: 320px;
+    }
+
+    .form-panel h2 {
+      color: #000;
+      font-size: 1rem;
+      margin-bottom: 12px;
+      font-weight: 600;
+      border-bottom: 1px solid #000;
+      padding-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 4px;
+      color: #000;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #000;
+      border-radius: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      font-size: 0.85rem;
+      transition: none;
+      background: repeating-linear-gradient(
+        45deg,
+        #fafbff 0px,
+        #fafbff 4px,
+        rgba(250, 251, 255, 0.3) 4px,
+        rgba(250, 251, 255, 0.3) 8px
+      );
+      color: #000;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #000;
+      box-shadow: none;
+      background: repeating-linear-gradient(
+        45deg,
+        #ffffff 0px,
+        #ffffff 4px,
+        rgba(255, 255, 255, 0.3) 4px,
+        rgba(255, 255, 255, 0.3) 8px
+      );
+    }
+
+    .form-group input[type="date"] {
+      cursor: pointer;
+    }
+
+    .form-group select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 16px;
+      padding-right: 30px;
+    }
+
+    .form-group.hidden {
+      display: none;
+    }
+
+    .button-group {
+      margin-top: 15px;
+    }
+
+    .button-group button {
+      width: 100%;
+      padding: 12px 24px;
+      border: 1px solid #000;
+      border-radius: 0;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: none;
+      box-shadow: none;
+      background: repeating-linear-gradient(
+        45deg,
+        #f0f0f0 0px,
+        #f0f0f0 4px,
+        rgba(240, 240, 240, 0.3) 4px,
+        rgba(240, 240, 240, 0.3) 8px
+      );
+      color: #000;
+    }
+
+    .btn-print:hover {
+      background: repeating-linear-gradient(
+        45deg,
+        #e0e0e0 0px,
+        #e0e0e0 4px,
+        rgba(224, 224, 224, 0.3) 4px,
+        rgba(224, 224, 224, 0.3) 8px
+      );
+    }
+
+    /* Document Preview */
+    .document-wrapper {
+      display: flex;
+      justify-content: center;
+      background-color: white;
+      border-radius: 0;
+      padding: 20px;
+      box-shadow: none;
+      border: 1px solid #000;
+      overflow: auto;
+      max-height: 100%;
+    }
+
+    .doc {
+      width: 210mm;
+      height: 297mm;
+      background: white;
+      padding: 20mm 20mm;
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+      position: relative;
+      line-height: 1.4;
+      font-family: 'Times New Roman', serif;
+      font-size: 12pt;
+      flex-shrink: 0;
+    }
+
+    .right-top {
+      text-align: right;
+      line-height: 1.4;
+      font-size: 12pt;
+      margin-bottom: 0;
+    }
+
+    .right-top div {
+      font-size: 12pt;
+    }
+
+    .line {
+      border-bottom: 1px solid #000;
+      display: inline-block;
+      padding: 0 2px;
+      min-width: 80px;
+      font-size: 12pt;
+    }
+
+    .small {
+      font-size:  8pt;
+      display: block;
+      text-align: right;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .center-title {
+      text-align: center;
+      font-weight: bold;
+      font-size: 14pt;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .text {
+      text-align: justify;
+      line-height: 1.6;
+      font-size: 12pt;
+      margin: 0;
+      text-indent: 1.25cm;
+    }
+
+    .signature-block {
+      text-align: right;
+      line-height: 1.4;
+      margin: 0;
+      font-size: 12pt;
+    }
+
+    .signature-block div {
+      margin: 0;
+      line-height: 1.4;
+      font-size: 12pt;
+    }
+
+    .underline {
+      border-bottom: 1px solid #000;
+      display: inline-block;
+      min-width: 100px;
+      padding: 0 2px;
+      font-size: 12pt;
+    }
+
+    .agree-title {
+      font-weight: bold;
+      margin: 0;
+      font-size: 14pt;
+      line-height: 1.4;
+    }
+
+    .agree-block {
+      margin: 0;
+      line-height: 1.6;
+      font-size: 12pt;
+    }
+
+    .agree-block div {
+      margin: 0;
+      line-height: 1.4;
+      font-size: 12pt;
+    }
+
+    .signature-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 15px;
+      gap: 10px;
+    }
+
+    .signature-cell {
+      flex: 1;
+      text-align: center;
+      font-size: 12pt;
+    }
+
+    .signature-line {
+      border-bottom: 1px solid #000;
+      min-height: 30px;
+      margin-bottom: 3px;
+    }
+
+    .signature-label {
+      font-size: 10pt;
+    }
+
+    .doc.hidden {
+      display: none;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+        zoom: 1;
+      }
+      .form-panel {
+        display: none;
+      }
+      .document-wrapper {
+        background: transparent;
+        box-shadow: none;
+        border: none;
+        padding: 0;
+        max-height: none;
+      }
+      .doc {
+        width: 210mm;
+        height: 297mm;
+        box-shadow: none;
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .content {
+        grid-template-columns: 1fr;
+      }
+      .form-panel {
+        position: static;
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .form-panel {
+        padding: 12px;
+        width: 100%;
+      }
+      .document-wrapper {
+        padding: 10px;
+      }
+      .doc {
+        width: 100%;
+        height: auto;
+        padding: 15mm 10mm;
+      }
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="content">
+    <div class="form-panel">
+      <h2>Параметры</h2>
+
+      <div class="form-group">
+        <label>Тип заявления:</label>
+        <select id="formType">
+          <option value="leave">Отпуск</option>
+          <option value="transfer">Перенос отпуска</option>
+          <option value="resignation">Увольнение</option>
+          <option value="recall">Отзыв увольнения</option>
+        </select>
+      </div>
+
+      <!-- Поля для заявления на отпуск -->
+      <div class="form-group" id="leaveTypeGroup">
+        <label>Тип отпуска:</label>
+        <select id="leaveType">
+          <option value="ежегодный основной оплачиваемый отпуск">Ежегодный оплачиваемый</option>
+          <option value="отпуск без сохранения заработной платы">Без сохранения</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>ООО:</label>
+        <input type="text" id="org" value="ООО «Парацельс»">
+      </div>
+
+      <div class="form-group">
+        <label>Директор:</label>
+        <input type="text" id="director" value="Бочаровой А.В.">
+      </div>
+
+      <div class="form-group">
+        <label>ФИО сотрудника:</label>
+        <select id="fio">
+          <option value="">-- Выберите сотрудника --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Должность:</label>
+        <select id="position">
+          <option value="">-- Выберите --</option>
+          <option value="Территориальный менеджер">Территориальный менеджер</option>
+          <option value="Заведующий аптечной организацией">Заведующий</option>
+          <option value="Провизор">Провизор</option>
+          <option value="Фармацевт">Фармацевт</option>
+          <option value="Консультант">Консультант</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="dateFromGroup">
+        <label>Дата начала:</label>
+        <input type="date" id="dateFrom">
+      </div>
+
+      <div class="form-group" id="dateToGroup">
+        <label>Дата конца:</label>
+        <input type="date" id="dateTo">
+      </div>
+
+      <div class="form-group" id="daysGroup">
+        <label>Дней:</label>
+        <input type="number" id="days" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+      </div>
+
+      <!-- Поля для заявления на перенос отпуска -->
+      <div class="form-group hidden" id="oldDateFromGroup">
+        <label>Старый отпуск начало:</label>
+        <input type="date" id="oldDateFrom">
+      </div>
+
+      <div class="form-group hidden" id="oldDateToGroup">
+        <label>Старый отпуск конец:</label>
+        <input type="date" id="oldDateTo">
+      </div>
+
+      <div class="form-group hidden" id="oldDaysGroup">
+        <label>Дней (старый):</label>
+        <input type="number" id="oldDays" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+      </div>
+
+      <div class="form-group hidden" id="newDateFromGroup">
+        <label>Новый отпуск начало:</label>
+        <input type="date" id="newDateFrom">
+      </div>
+
+      <div class="form-group hidden" id="newDateToGroup">
+        <label>Новый отпуск конец:</label>
+        <input type="date" id="newDateTo">
+      </div>
+
+      <div class="form-group hidden" id="reasonGroup">
+        <label>Причина:</label>
+        <input type="text" id="reason" placeholder="Семейные обстоятельства" value="семейные обстоятельства">
+      </div>
+
+      <!-- Поля для заявления на увольнение -->
+      <div class="form-group hidden" id="resignationDateGroup">
+        <label>Дата увольнения:</label>
+        <input type="date" id="resignationDate">
+      </div>
+
+      <!-- Поле для заявления на отзыв увольнения -->
+      <div class="form-group hidden" id="resignationDateRecallGroup">
+        <label>Дата заявления:</label>
+        <input type="date" id="resignationDateRecall">
+      </div>
+
+      <div class="form-group" id="reqDateGroup">
+        <label>Дата подачи:</label>
+        <input type="date" id="reqDate">
+      </div>
+
+      <div class="button-group">
+        <button class="btn-print" onclick="printDocument()">Печать</button>
+      </div>
+    </div>
+
+    <div class="document-wrapper">
+      <!-- Заявление на отпуск -->
+      <div class="doc" id="leaveDoc">
+        <div class="right-top">
+          <div>Директору региона</div>
+          <div><span id="orgText">ООО «Парацельс»</span></div>
+          <div><span id="directorText" class="line">Бочаровой А.В.</span></div>
+          <div class="small">(Ф.И.О. руководителя)</div>
+          <div style="margin-top: 10px; font-size: 12pt;">От <span id="fioText" class="line"></span></div>
+          <div class="small">(Ф.И.О. работника)</div>
+          <div style="font-size: 12pt;"><span id="positionText" class="line"></span></div>
+          <div class="small">(должность работника)</div>
+        </div>
+
+        <br><br><br><br><br><br><br>
+
+        <div class="center-title">ЗАЯВЛЕНИЕ</div>
+
+        <br>
+
+        <div class="text">
+          Прошу Вас предоставить мне <span id="leaveTypeText"></span> с <span id="dateFromText"></span> по <span id="dateToText"></span> продолжительностью <span id="daysText"></span> календарных дней.
+        </div>
+
+        <br><br><br><br><br>
+
+        <div class="signature-block">
+          <div style="font-size: 14pt;">Подпись: <span class="underline" style="min-width:80px;"></span></div>
+          <div style="margin-top: 8px; font-size: 14pt;">Дата: <span id="reqDateText" class="line" style="min-width:120px;"></span></div>
+        </div>
+
+        <br><br>
+
+        <div class="agree-title">СОГЛАСОВАНО:</div>
+        <div class="agree-block">
+          <div style="margin-bottom: 20px; font-size: 12pt;">Руководитель структурного подразделения</div>
+
+          <div class="signature-row">
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(должность)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(подпись)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(расшифровка подписи)</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 15px; text-align: right; font-size: 12pt;">«___» __________________ 20__ г.</div>
+        </div>
+      </div>
+
+      <!-- Заявление на перенос отпуска -->
+      <div class="doc hidden" id="transferDoc">
+        <div class="right-top">
+          <div>Директору региона</div>
+          <div><span id="orgText2">ООО «Парацельс»</span></div>
+          <div><span id="directorText2" class="line">Бочаровой А.В.</span></div>
+          <div class="small">(Ф.И.О. руководителя)</div>
+          <div style="margin-top: 10px; font-size: 12pt;">От <span id="fioText2" class="line"></span></div>
+          <div class="small">(Ф.И.О. работника)</div>
+          <div style="font-size: 12pt;"><span id="positionText2" class="line"></span></div>
+          <div class="small">(должность работника)</div>
+        </div>
+
+        <br><br><br><br><br><br><br>
+
+        <div class="center-title">ЗАЯВЛЕНИЕ</div>
+
+        <br>
+
+        <div class="text">
+          Прошу Вас перенести мой ежегодный основной оплачиваемый отпуск, запланированный по графику отпусков в период с <span id="oldDateFromText"></span> по <span id="oldDateToText"></span> продолжительностью <span id="oldDaysText"></span> календарных дней на период с <span id="newDateFromText"></span> по <span id="newDateToText"></span> в связи с <span id="reasonText"></span>.
+        </div>
+
+        <br><br><br><br><br>
+
+        <div class="signature-block">
+          <div style="font-size: 14pt;">Подпись: <span class="underline" style="min-width:80px;"></span></div>
+          <div style="margin-top: 8px; font-size: 14pt;">Дата: <span id="reqDateText2" class="line" style="min-width:120px;"></span></div>
+        </div>
+
+        <br><br>
+
+        <div class="agree-title">СОГЛАСОВАНО:</div>
+        <div class="agree-block">
+          <div style="margin-bottom: 20px; font-size: 12pt;">Руководитель структурного подразделения</div>
+
+          <div class="signature-row">
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(должность)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(подпись)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(расшифровка подписи)</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 15px; text-align: right; font-size: 12pt;">«___» __________________ 20__ г.</div>
+        </div>
+      </div>
+
+      <!-- Заявление на увольнение -->
+      <div class="doc hidden" id="resignationDoc">
+        <div class="right-top">
+          <div>Директору региона</div>
+          <div><span id="orgText3">ООО «Парацельс»</span></div>
+          <div><span id="directorText3" class="line">Бочаровой А.В.</span></div>
+          <div class="small">(Ф.И.О. руководителя)</div>
+          <div style="margin-top: 10px; font-size: 12pt;">От <span id="fioText3" class="line"></span></div>
+          <div class="small">(Ф.И.О. работника)</div>
+          <div style="font-size: 12pt;"><span id="positionText3" class="line"></span></div>
+          <div class="small">(должность работника)</div>
+        </div>
+
+        <br><br><br><br><br><br><br>
+
+        <div class="center-title">ЗАЯВЛЕНИЕ</div>
+
+        <br>
+
+        <div class="text">
+          Прошу Вас уволить меня по собственному желанию с <span id="resignationDateText"></span>.
+        </div>
+
+        <br><br><br><br><br>
+
+        <div class="signature-block">
+          <div style="font-size: 14pt;">Подпись: <span class="underline" style="min-width:80px;"></span></div>
+          <div style="margin-top: 8px; font-size: 14pt;">Дата: <span id="reqDateText3" class="line" style="min-width:120px;"></span></div>
+        </div>
+
+        <br><br>
+
+        <div class="agree-title">СОГЛАСОВАНО:</div>
+        <div class="agree-block">
+          <div style="margin-bottom: 20px; font-size: 12pt;">Руководитель структурного подразделения</div>
+
+          <div class="signature-row">
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(должность)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(подпись)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(расшифровка подписи)</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 15px; text-align: right; font-size: 12pt;">«___» __________________ 20__ г.</div>
+        </div>
+      </div>
+
+      <!-- Заявление на отзыв увольнения -->
+      <div class="doc hidden" id="recallDoc">
+        <div class="right-top">
+          <div>Директору региона</div>
+          <div><span id="orgText4">ООО «Парацельс»</span></div>
+          <div><span id="directorText4" class="line">Бочаровой А.В.</span></div>
+          <div class="small">(Ф.И.О. руководителя)</div>
+          <div style="margin-top: 10px; font-size: 12pt;">От <span id="fioText4" class="line"></span></div>
+          <div class="small">(Ф.И.О. работника)</div>
+          <div style="font-size: 12pt;"><span id="positionText4" class="line"></span></div>
+          <div class="small">(должность работника)</div>
+        </div>
+
+        <br><br><br><br><br><br><br>
+
+        <div class="center-title">ЗАЯВЛЕНИЕ</div>
+
+        <br>
+
+        <div class="text">
+          Прошу Вас отозвать мое заявление об увольнении от <span id="resignationDateRecallText"></span>.
+        </div>
+
+        <br><br><br><br><br>
+
+        <div class="signature-block">
+          <div style="font-size: 14pt;">Подпись: <span class="underline" style="min-width:80px;"></span></div>
+          <div style="margin-top: 8px; font-size: 14pt;">Дата: <span id="reqDateText4" class="line" style="min-width:120px;"></span></div>
+        </div>
+
+        <br><br>
+
+        <div class="agree-title">СОГЛАСОВАНО:</div>
+        <div class="agree-block">
+          <div style="margin-bottom: 20px; font-size: 12pt;">Руководитель структурного подразделения</div>
+
+          <div class="signature-row">
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(должность)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(подпись)</div>
+            </div>
+            <div class="signature-cell">
+              <div class="signature-line"></div>
+              <div class="signature-label">(расшифровка подписи)</div>
+            </div>
+          </div>
+
+          <div style="margin-top: 15px; text-align: right; font-size: 12pt;">«___» __________________ 20__ г.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <script>
+  // ================= FIREBASE INITIALIZATION =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyCnltG-ciUwtpZhFaAhTzLI_cjtVZURgEo",
+    authDomain: "grafiki-aptek.firebaseapp.com",
+    projectId: "grafiki-aptek",
+    storageBucket: "grafiki-aptek.firebasestorage.app",
+    messagingSenderId: "372041187072",
+    appId: "1:372041187072:web:14b4326e85d3f347523de5",
+    measurementId: "G-2KTEGH1MFK",
+    databaseURL: "https://grafiki-aptek-default-rtdb.firebaseio.com/"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
+  // Firebase wrapper functions
+  async function firebaseGetItem(key) {
+    try {
+      const snapshot = await database.ref('appData/' + key).once('value');
+      return snapshot.val();
+    } catch (error) {
+      console.error('❌ Firebase getItem error:', error);
+      return null;
+    }
+  }
+
+  // Справочники
+  let employeeReference = [];
+
+  // Загрузка справочников
+  async function loadReferences() {
+    try {
+      const refData = await firebaseGetItem('scheduleReferenceData');
+      if (refData) {
+        const data = typeof refData === 'string' ? JSON.parse(refData) : refData;
+        employeeReference = data.employeeReference || [];
+        updateEmployeeSelect();
+      }
+    } catch (e) {
+      console.error('Ошибка загрузки справочников:', e);
+    }
+  }
+
+  // Обновление списка сотрудников в select
+  function updateEmployeeSelect() {
+    const select = document.getElementById('fio');
+    if (!select) return;
+
+    // Сортируем по имени
+    const sorted = [...employeeReference].sort((a, b) => a.name.localeCompare(b.name));
+
+    // Сохраняем текущее выбранное значение
+    const currentValue = select.value;
+
+    select.innerHTML = '<option value="">-- Выберите сотрудника --</option>';
+    sorted.forEach(emp => {
+      const option = document.createElement('option');
+      option.value = emp.id;
+      option.textContent = emp.name;
+      select.appendChild(option);
+    });
+
+    // Восстанавливаем выбранное значение, если оно было
+    if (currentValue) {
+      select.value = currentValue;
+    }
+  }
+
+  // Преобразование ФИО в формат "Фамилия И.О."
+  function formatFIO(fullName) {
+    if (!fullName) return '';
+    
+    // Если уже в формате "Фамилия И.О." (содержит точку после инициала), возвращаем как есть
+    if (fullName.match(/[А-ЯЁ]\.[А-ЯЁ]\./)) {
+      return fullName;
+    }
+    
+    // Разбиваем на части
+    const parts = fullName.trim().split(/\s+/);
+    if (parts.length < 2) return fullName;
+    
+    // Берем фамилию (первая часть)
+    const lastName = parts[0];
+    
+    // Формируем инициалы из остальных частей
+    const initials = parts.slice(1).map(part => {
+      if (part.length > 0) {
+        return part[0].toUpperCase() + '.';
+      }
+      return '';
+    }).join('');
+    
+    return `${lastName} ${initials}`.trim();
+  }
+
+  // Обработчик выбора сотрудника
+  function onEmployeeSelectChange() {
+    const select = document.getElementById('fio');
+    const positionSelect = document.getElementById('position');
+
+    if (!select || !select.value) {
+      // Обнуляем должность при очистке выбора
+      if (positionSelect) positionSelect.value = "";
+      updateDocument();
+      return;
+    }
+
+    const employee = employeeReference.find(e => e.id === select.value);
+    if (employee && positionSelect) {
+      // Заполняем должность из справочника
+      const employeePosition = employee.position || '';
+      
+      if (employeePosition) {
+        // Ищем соответствующую опцию в select (точное совпадение)
+        const options = Array.from(positionSelect.options);
+        let matchingOption = options.find(opt => opt.value === employeePosition);
+        
+        // Если точного совпадения нет, пытаемся найти по частичному совпадению
+        if (!matchingOption) {
+          matchingOption = options.find(opt => 
+            opt.value.toLowerCase().includes(employeePosition.toLowerCase()) ||
+            employeePosition.toLowerCase().includes(opt.value.toLowerCase())
+          );
+        }
+        
+        if (matchingOption) {
+          positionSelect.value = matchingOption.value;
+        }
+        // Если совпадения нет, поле останется пустым, пользователь может выбрать вручную
+      }
+      
+      // Обновляем документ
+      updateDocument();
+    }
+  }
+
+  const positionsCases = {
+    'Территориальный менеджер': 'Территориального менеджера',
+    'Заведующий аптечной организацией': 'Заведующего аптечной организацией',
+    'Провизор': 'Провизора',
+    'Фармацевт': 'Фармацевта',
+    'Консультант': 'Консультанта'
+  };
+
+  function formatDateRu(dateStr) {
+    if (!dateStr) return '';
+    const date = new Date(dateStr + 'T00:00:00');
+    const day = String(date.getDate()).padStart(2, '0');
+    const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+                    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+    return `«${day}» ${month} ${year}`;
+  }
+
+  function calculateDays(fromId, toId, daysId) {
+    const dateFromInput = document.getElementById(fromId).value;
+    const dateToInput = document.getElementById(toId).value;
+
+    if (!dateFromInput || !dateToInput) {
+      document.getElementById(daysId).value = '';
+      return;
+    }
+
+    const dateFrom = new Date(dateFromInput + 'T00:00:00');
+    const dateTo = new Date(dateToInput + 'T00:00:00');
+
+    if (dateFrom > dateTo) {
+      document.getElementById(daysId).value = '';
+      return;
+    }
+
+    const timeDiff = dateTo - dateFrom;
+    const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+    document.getElementById(daysId).value = daysDiff;
+  }
+
+  function setReqDate(fromId) {
+    const dateFromInput = document.getElementById(fromId).value;
+    if (!dateFromInput) return;
+
+    const dateFrom = new Date(dateFromInput + 'T00:00:00');
+    const reqDate = new Date(dateFrom);
+    reqDate.setDate(reqDate.getDate() - 14);
+
+    const year = reqDate.getFullYear();
+    const month = String(reqDate.getMonth() + 1).padStart(2, '0');
+    const day = String(reqDate.getDate()).padStart(2, '0');
+    document.getElementById('reqDate').value = `${year}-${month}-${day}`;
+  }
+
+  function setTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    document.getElementById('reqDate').value = `${year}-${month}-${day}`;
+  }
+
+  function switchForm() {
+    const formType = document.getElementById('formType').value;
+    const docs = ['leaveDoc', 'transferDoc', 'resignationDoc', 'recallDoc'];
+    docs.forEach(doc => document.getElementById(doc).classList.add('hidden'));
+
+    const groups = ['leaveTypeGroup', 'dateFromGroup', 'dateToGroup', 'daysGroup',
+                    'oldDateFromGroup', 'oldDateToGroup', 'oldDaysGroup',
+                    'newDateFromGroup', 'newDateToGroup', 'reasonGroup',
+                    'resignationDateGroup', 'resignationDateRecallGroup'];
+    groups.forEach(g => document.getElementById(g).classList.add('hidden'));
+
+    if (formType === 'leave') {
+      document.getElementById('leaveDoc').classList.remove('hidden');
+      ['leaveTypeGroup', 'dateFromGroup', 'dateToGroup', 'daysGroup'].forEach(g => 
+        document.getElementById(g).classList.remove('hidden'));
+    } else if (formType === 'transfer') {
+      document.getElementById('transferDoc').classList.remove('hidden');
+      ['oldDateFromGroup', 'oldDateToGroup', 'oldDaysGroup',
+       'newDateFromGroup', 'newDateToGroup', 'reasonGroup'].forEach(g => 
+        document.getElementById(g).classList.remove('hidden'));
+    } else if (formType === 'resignation') {
+      document.getElementById('resignationDoc').classList.remove('hidden');
+      document.getElementById('resignationDateGroup').classList.remove('hidden');
+    } else if (formType === 'recall') {
+      document.getElementById('recallDoc').classList.remove('hidden');
+      document.getElementById('resignationDateRecallGroup').classList.remove('hidden');
+      setTodayDate();
+    }
+    
+    // Автоматически обновляем документ после переключения типа формы
+    fillDoc();
+  }
+
+  // Функция для обработки изменений - как в sz.html
+  function updateDocument() {
+    // Выполняем расчеты для полей с датами
+    calculateDays('dateFrom', 'dateTo', 'days');
+    calculateDays('oldDateFrom', 'oldDateTo', 'oldDays');
+    
+    // Устанавливаем дату подачи для соответствующих полей
+    const dateFromEl = document.getElementById('dateFrom');
+    const resignationDateEl = document.getElementById('resignationDate');
+    const newDateFromEl = document.getElementById('newDateFrom');
+    
+    if (dateFromEl && dateFromEl.value) setReqDate('dateFrom');
+    if (resignationDateEl && resignationDateEl.value) setReqDate('resignationDate');
+    if (newDateFromEl && newDateFromEl.value) setReqDate('newDateFrom');
+    
+    // Обновляем документ в реальном времени
+    fillDoc();
+  }
+
+  // Добавляем обработчики на все поля для автоматического обновления в реальном времени
+  function setupAutoUpdate() {
+    // Как в sz.html - добавляем обработчик input для всех input и textarea полей
+    // querySelectorAll находит все поля, включая скрытые
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+      // Событие input срабатывает при каждом изменении (реальное время)
+      // readonly поля не генерируют input события, поэтому их можно не пропускать
+      input.addEventListener('input', updateDocument);
+      
+      // Для дат также добавляем change (выбор из календаря)
+      if (input.type === 'date') {
+        input.addEventListener('change', updateDocument);
+      }
+    });
+
+    // Для select элементов используем change событие
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+      if (select.id === 'formType') {
+        select.addEventListener('change', switchForm);
+      } else if (select.id === 'fio') {
+        // Специальная обработка для выбора сотрудника
+        select.addEventListener('change', () => {
+          onEmployeeSelectChange();
+        });
+      } else {
+        select.addEventListener('change', updateDocument);
+      }
+    });
+  }
+
+  // Инициализация при загрузке страницы
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', async () => {
+      await loadReferences();
+      setupAutoUpdate();
+      fillDoc();
+    });
+  } else {
+    // DOM уже загружен
+    (async () => {
+      await loadReferences();
+      setupAutoUpdate();
+      fillDoc();
+    })();
+  }
+
+  function fillDoc() {
+    // Получаем ФИО из выбранного сотрудника
+    const fioSelect = document.getElementById('fio');
+    let fio = '';
+    if (fioSelect && fioSelect.value) {
+      const employee = employeeReference.find(e => e.id === fioSelect.value);
+      if (employee) {
+        fio = formatFIO(employee.name);
+      }
+    }
+    
+    const position = document.getElementById('position').value || '';
+    const formType = document.getElementById('formType').value;
+    const positionAccusative = positionsCases[position] || position;
+    const org = document.getElementById('org').value || '';
+    const director = document.getElementById('director').value || '';
+    const reqDateInput = document.getElementById('reqDate').value || '';
+
+    if (formType === 'leave') {
+      const leaveType = document.getElementById('leaveType').value || '';
+      const dateFromInput = document.getElementById('dateFrom').value || '';
+      const dateToInput = document.getElementById('dateTo').value || '';
+      const days = document.getElementById('days').value || '';
+
+      document.getElementById('orgText').textContent = org;
+      document.getElementById('directorText').textContent = director;
+      document.getElementById('fioText').textContent = fio;
+      document.getElementById('positionText').textContent = positionAccusative;
+      document.getElementById('leaveTypeText').textContent = leaveType;
+      document.getElementById('dateFromText').textContent = dateFromInput ? formatDateRu(dateFromInput) : '';
+      document.getElementById('dateToText').textContent = dateToInput ? formatDateRu(dateToInput) : '';
+      document.getElementById('daysText').textContent = days;
+      document.getElementById('reqDateText').textContent = reqDateInput ? formatDateRu(reqDateInput) : '';
+    } else if (formType === 'transfer') {
+      const oldDateFromInput = document.getElementById('oldDateFrom').value || '';
+      const oldDateToInput = document.getElementById('oldDateTo').value || '';
+      const newDateFromInput = document.getElementById('newDateFrom').value || '';
+      const newDateToInput = document.getElementById('newDateTo').value || '';
+      const reason = document.getElementById('reason').value || '';
+      const oldDays = document.getElementById('oldDays').value || '';
+
+      document.getElementById('orgText2').textContent = org;
+      document.getElementById('directorText2').textContent = director;
+      document.getElementById('fioText2').textContent = fio;
+      document.getElementById('positionText2').textContent = positionAccusative;
+      document.getElementById('oldDateFromText').textContent = oldDateFromInput ? formatDateRu(oldDateFromInput) : '';
+      document.getElementById('oldDateToText').textContent = oldDateToInput ? formatDateRu(oldDateToInput) : '';
+      document.getElementById('oldDaysText').textContent = oldDays;
+      document.getElementById('newDateFromText').textContent = newDateFromInput ? formatDateRu(newDateFromInput) : '';
+      document.getElementById('newDateToText').textContent = newDateToInput ? formatDateRu(newDateToInput) : '';
+      document.getElementById('reasonText').textContent = reason;
+      document.getElementById('reqDateText2').textContent = reqDateInput ? formatDateRu(reqDateInput) : '';
+    } else if (formType === 'resignation') {
+      const resignationDateInput = document.getElementById('resignationDate').value || '';
+
+      document.getElementById('orgText3').textContent = org;
+      document.getElementById('directorText3').textContent = director;
+      document.getElementById('fioText3').textContent = fio;
+      document.getElementById('positionText3').textContent = positionAccusative;
+      document.getElementById('resignationDateText').textContent = resignationDateInput ? formatDateRu(resignationDateInput) : '';
+      document.getElementById('reqDateText3').textContent = reqDateInput ? formatDateRu(reqDateInput) : '';
+    } else if (formType === 'recall') {
+      const resignationDateRecallInput = document.getElementById('resignationDateRecall').value || '';
+
+      document.getElementById('orgText4').textContent = org;
+      document.getElementById('directorText4').textContent = director;
+      document.getElementById('fioText4').textContent = fio;
+      document.getElementById('positionText4').textContent = positionAccusative;
+      document.getElementById('resignationDateRecallText').textContent = resignationDateRecallInput ? formatDateRu(resignationDateRecallInput) : '';
+      document.getElementById('reqDateText4').textContent = reqDateInput ? formatDateRu(reqDateInput) : '';
+    }
+  }
+
+
+    function printDocument() {
+      const fio = document.getElementById('fio').value || 'Сотрудник';
+      const formTypeSelect = document.getElementById('formType');
+      let typeText = formTypeSelect.options[formTypeSelect.selectedIndex].text;
+
+      // Set the document title for the PDF filename
+      document.title = 'Заявление на ' + typeText + ' от ' + fio;
+
+      window.print();
+    }
+    </script>
+
+</body>
+</html>
