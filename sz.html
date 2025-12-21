@@ -704,6 +704,7 @@
 
                 <div class="button-group">
                     <button class="btn-print" onclick="printDocument()">Печать</button>
+                    <button id="sendDataBtn" class="btn-send" onclick="sendCompensationData()" style="display: none; margin-top: 10px;">Отправить данные</button>
                 </div>
             </div>
 
@@ -819,6 +820,40 @@
                     console.error('❌ localStorage также не работает:', e);
                     return null;
                 }
+            }
+        }
+
+        // Функция для безопасного кодирования ключей Firebase
+        function encodeFirebaseKey(key) {
+            return String(key)
+                .replace(/\./g, '_DOT_')
+                .replace(/#/g, '_HASH_')
+                .replace(/\$/g, '_DOLLAR_')
+                .replace(/\//g, '_SLASH_')
+                .replace(/\[/g, '_LBRACKET_')
+                .replace(/\]/g, '_RBRACKET_');
+        }
+
+        // Функция для декодирования ключей Firebase
+        function decodeFirebaseKey(key) {
+            return String(key)
+                .replace(/_DOT_/g, '.')
+                .replace(/_HASH_/g, '#')
+                .replace(/_DOLLAR_/g, '$')
+                .replace(/_SLASH_/g, '/')
+                .replace(/_LBRACKET_/g, '[')
+                .replace(/_RBRACKET_/g, ']');
+        }
+
+        async function firebaseSetItem(key, value) {
+            try {
+                const ref = database.ref('appData/' + key);
+                await ref.set(value);
+                console.log('✅ Firebase: сохранено', key);
+                return true;
+            } catch (error) {
+                console.error('❌ Firebase setItem error:', error);
+                return false;
             }
         }
 
@@ -1128,6 +1163,109 @@
             }, 1000);
         }
 
+        // Функция отправки данных компенсации
+        async function sendCompensationData() {
+            // Обновляем документ перед отправкой
+            updateDocument();
+            
+            // Проверяем, что тип документа - компенсация
+            if (state.documentType !== 'compensation') {
+                alert('Отправка данных доступна только для компенсации в заработную плату');
+                return;
+            }
+            
+            // Проверяем, что выбран сотрудник
+            if (!state.employee || !state.employee.trim()) {
+                alert('Пожалуйста, выберите сотрудника');
+                return;
+            }
+            
+            // Проверяем, что заполнены обязательные поля
+            if (!state.comment || !state.comment.trim()) {
+                alert('Пожалуйста, заполните комментарий');
+                return;
+            }
+            
+            // Определяем значение (сумма или часы)
+            let value = null;
+            let valueType = null;
+            if (state.valueType === 'hours') {
+                if (!state.hours || state.hours <= 0) {
+                    alert('Пожалуйста, укажите количество часов');
+                    return;
+                }
+                value = state.hours;
+                valueType = 'hours';
+            } else {
+                if (!state.amount || state.amount <= 0) {
+                    alert('Пожалуйста, укажите сумму');
+                    return;
+                }
+                value = state.amount;
+                valueType = 'amount';
+            }
+            
+            // Формируем данные для отправки
+            const compensationData = {
+                employeeName: state.employee,
+                employeeTitle: state.employeeTitle,
+                employeeDepartment: state.employeeDepartment,
+                periodMonth: state.periodMonth,
+                periodYear: state.periodYear,
+                value: value,
+                valueType: valueType,
+                comment: state.comment,
+                date: state.date || new Date().toISOString().split('T')[0],
+                timestamp: Date.now()
+            };
+            
+            try {
+                // Загружаем существующие данные компенсации
+                const compensationKey = 'compensationData';
+                let allCompensations = await firebaseGetItem(compensationKey);
+                if (!allCompensations) {
+                    allCompensations = {};
+                }
+                if (typeof allCompensations === 'string') {
+                    allCompensations = JSON.parse(allCompensations);
+                }
+                
+                // Используем безопасный ключ для имени сотрудника
+                const safeEmployeeKey = encodeFirebaseKey(state.employee);
+                
+                // Создаем структуру данных по сотрудникам и периодам
+                if (!allCompensations[safeEmployeeKey]) {
+                    allCompensations[safeEmployeeKey] = {};
+                }
+                
+                const periodKey = `${state.periodYear}_${state.periodMonth}`;
+                console.log('Сохраняем данные компенсации:');
+                console.log('Сотрудник:', state.employee, '(закодированный ключ:', safeEmployeeKey + ')');
+                console.log('Период:', periodKey, '(год:', state.periodYear, ', месяц:', state.periodMonth + ')');
+                console.log('Данные:', compensationData);
+                
+                if (!allCompensations[safeEmployeeKey][periodKey]) {
+                    allCompensations[safeEmployeeKey][periodKey] = [];
+                }
+                
+                // Добавляем новую запись
+                allCompensations[safeEmployeeKey][periodKey].push(compensationData);
+                console.log('Структура данных перед сохранением:', JSON.stringify(allCompensations, null, 2));
+                
+                // Сохраняем в Firebase
+                const success = await firebaseSetItem(compensationKey, allCompensations);
+                
+                if (success) {
+                    alert('Данные успешно отправлены!');
+                } else {
+                    alert('Ошибка при отправке данных. Попробуйте еще раз.');
+                }
+            } catch (error) {
+                console.error('Ошибка при отправке данных:', error);
+                alert('Ошибка при отправке данных: ' + error.message);
+            }
+        }
+
         // Функция переключения типов документа
         function toggleDocumentType() {
             const docTypeSelect = document.getElementById('documentTypeInput');
@@ -1176,6 +1314,12 @@
             const elCopyTitle = document.getElementById('copyTitleInput');
             if (elCopyTo) elCopyTo.value = state.copyTo;
             if (elCopyTitle) elCopyTitle.value = state.copyTitle;
+
+            // Показать/скрыть кнопку "Отправить данные" для компенсации
+            const sendDataBtn = document.getElementById('sendDataBtn');
+            if (sendDataBtn) {
+                sendDataBtn.style.display = isCompensation ? 'block' : 'none';
+            }
         }
 
         function updateDocument() {
