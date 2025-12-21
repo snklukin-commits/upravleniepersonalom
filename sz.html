@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Генератор СЗ: Компенсация в заработную плату</title>
+    <title>Генератор СЗ: Компенсация в заработную плату / ТМЦ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
@@ -18,6 +18,10 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
             background: white;
+            padding: 20px;
+            min-height: 100vh;
+            zoom: 0.85;
+            transform-origin: top left;
         }
         
         /* Эмуляция листа A4 */
@@ -25,7 +29,7 @@
             width: 210mm;
             min-height: 297mm;
             padding: 20mm;
-            margin: 0 auto 20px auto; 
+            margin: 0; 
             background: white;
             box-shadow: none;
             border: 1px solid #000;
@@ -125,10 +129,189 @@
             border-bottom: 1px solid #000 !important;
         }
         
-        /* Стили для aside */
-        aside {
-            background: white !important;
-            border-right: 1px solid #000 !important;
+        /* Стили для form-panel (как в zayavleniya) */
+        .form-panel {
+            background-color: white;
+            border-radius: 0;
+            padding: 15px;
+            box-shadow: none;
+            border: 1px solid #000;
+            height: fit-content;
+            overflow-y: visible;
+            position: sticky;
+            top: 20px;
+            width: 320px;
+            align-self: start;
+        }
+
+        .form-panel h2 {
+            color: #000;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+            border-bottom: 1px solid #000;
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .form-panel .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-panel .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            color: #000;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .form-panel .input-field {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #000;
+            border-radius: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            font-size: 0.85rem;
+            transition: none;
+            background: repeating-linear-gradient(
+                45deg,
+                #fafbff 0px,
+                #fafbff 4px,
+                rgba(250, 251, 255, 0.3) 4px,
+                rgba(250, 251, 255, 0.3) 8px
+            );
+            color: #000;
+            box-sizing: border-box;
+        }
+
+        .form-panel .input-field:focus {
+            outline: none;
+            border-color: #000;
+            box-shadow: none;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+        }
+
+        .form-panel .input-field[type="date"] {
+            cursor: pointer;
+        }
+
+        .form-panel .input-field[type="file"] {
+            cursor: pointer;
+        }
+
+        .form-panel select.input-field {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            background-size: 16px;
+            padding-right: 30px;
+        }
+
+        .form-panel textarea.input-field {
+            resize: vertical;
+            min-height: 60px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+
+        .accordion-group {
+            margin-bottom: 12px;
+            border: 1px solid #000;
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 14px;
+            cursor: pointer;
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0 0px,
+                #f0f0f0 4px,
+                rgba(240, 240, 240, 0.3) 4px,
+                rgba(240, 240, 240, 0.3) 8px
+            );
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #000;
+            user-select: none;
+        }
+
+        .accordion-header:hover {
+            background: repeating-linear-gradient(
+                45deg,
+                #e0e0e0 0px,
+                #e0e0e0 4px,
+                rgba(224, 224, 224, 0.3) 4px,
+                rgba(224, 224, 224, 0.3) 8px
+            );
+        }
+
+        .accordion-icon {
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .accordion-content {
+            padding: 12px 14px;
+            border-top: 1px solid #000;
+        }
+
+        .accordion-content .form-group {
+            margin-bottom: 12px;
+        }
+
+        .accordion-content .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .button-group {
+            margin-top: 15px;
+        }
+
+        .button-group button {
+            width: 100%;
+            padding: 12px 24px;
+            border: 1px solid #000;
+            border-radius: 0;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: none;
+            box-shadow: none;
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0 0px,
+                #f0f0f0 4px,
+                rgba(240, 240, 240, 0.3) 4px,
+                rgba(240, 240, 240, 0.3) 8px
+            );
+            color: #000;
+        }
+
+        .button-group button:hover {
+            background: repeating-linear-gradient(
+                45deg,
+                #e0e0e0 0px,
+                #e0e0e0 4px,
+                rgba(224, 224, 224, 0.3) 4px,
+                rgba(224, 224, 224, 0.3) 8px
+            );
         }
         
         /* Стили для кнопок */
@@ -220,9 +403,33 @@
             ) !important;
         }
         
+        /* Контейнер */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: minmax(280px, 320px) 1fr;
+            gap: 20px;
+        }
+
         /* Основной контент */
         main {
             background: white !important;
+        }
+        
+        .pages-container {
+            display: flex;
+            justify-content: center;
+            background-color: white;
+            border-radius: 0;
+            padding: 20px;
+            box-shadow: none;
+            border: 1px solid #000;
+            overflow: auto;
+            max-height: 100%;
         }
         
         /* Настройки печати */
@@ -246,13 +453,14 @@
                 width: 100% !important;
                 height: auto !important;
                 overflow: visible !important;
+                zoom: 1;
             }
             
             .no-print {
                 display: none !important;
             }
             
-            header, aside {
+            .form-panel {
                 display: none !important;
             }
             
@@ -339,168 +547,168 @@
                 content: none !important;
             }
         }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            .form-panel {
+                position: static;
+                width: 100%;
+                max-width: 400px;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .form-panel {
+                padding: 12px;
+                width: 100%;
+                max-width: 100%;
+                min-width: auto;
+            }
+        }
     </style>
 </head>
-<body class="text-gray-800 h-screen flex flex-col overflow-hidden">
-
-    <!-- Шапка приложения -->
-    <header class="h-16 flex-none no-print z-20" style="background: white; border-bottom: 1px solid #000;">
-        <div class="container mx-auto px-4 h-full flex items-center justify-end">
-            <div class="flex gap-3">
-                <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 text-sm" style="background: repeating-linear-gradient(45deg, #f0f0f0 0px, #f0f0f0 4px, rgba(240, 240, 240, 0.3) 4px, rgba(240, 240, 240, 0.3) 8px); color: #000; border: 1px solid #000; border-radius: 0; font-weight: 600;">
-                    <span>🖨️ Печать</span>
-                </button>
-            </div>
-        </div>
-    </header>
+<body class="text-gray-800" style="min-height: 100vh;">
 
     <!-- Основной контент -->
-    <div class="flex flex-1 overflow-hidden">
-        
-        <!-- Левая панель: Управление -->
-        <aside class="w-full md:w-[350px] overflow-y-auto no-print flex flex-col z-10" style="background: white; border-right: 1px solid #000;">
-            <div class="p-6">
-                <form id="docForm" class="space-y-4" onsubmit="return false;">
-                    
-                    <!-- 1. ОТ КОГО -->
-                    <div class="space-y-3 border-b border-black pb-4">
-                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">От кого</h3>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Сотрудник</label>
-                            <select id="employeeSelect" 
-                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
-                                <option value="">-- Выберите сотрудника --</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">ФИО</label>
-                            <input type="text" id="employeeInput" value="" 
-                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Должность</label>
-                            <input type="text" id="employeeTitleInput" value="" 
-                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Подразделение</label>
-                            <input type="text" id="employeeDepartmentInput" value="" 
-                                class="input-field w-full px-3 py-2 text-sm text-black" style="padding: 12px 14px;">
-                        </div>
-                    </div>
+    <div class="container">
+        <div class="content">
+            <!-- Левая панель: Управление -->
+            <div class="form-panel no-print z-10">
+                <h2>Параметры</h2>
 
-                    <!-- 2. ТЕКСТ ЗАЯВЛЕНИЯ -->
-                    <div class="space-y-3 border-b border-black pb-4">
-                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Текст заявления</h3>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Расчетный период</label>
-                            <div class="grid grid-cols-2 gap-2">
-                                <select id="periodMonthInput" 
-                                    class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
-                                    <option value="0">Январь</option>
-                                    <option value="1">Февраль</option>
-                                    <option value="2">Март</option>
-                                    <option value="3">Апрель</option>
-                                    <option value="4">Май</option>
-                                    <option value="5">Июнь</option>
-                                    <option value="6">Июль</option>
-                                    <option value="7">Август</option>
-                                    <option value="8">Сентябрь</option>
-                                    <option value="9">Октябрь</option>
-                                    <option value="10">Ноябрь</option>
-                                    <option value="11">Декабрь</option>
-                                </select>
-                                <select id="periodYearInput" 
-                                    class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Комментарий (обязательно)</label>
-                            <textarea id="commentInput" rows="3" 
-                                class="input-field w-full text-sm text-black"
-                                placeholder="Дополнительный комментарий..." style="padding: 12px 14px;"></textarea>
-                        </div>
-                        <input type="hidden" id="reasonInput" value="">
-                        <div class="hidden">
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Объект</label>
-                            <input type="text" id="objectInput" list="objectsList" placeholder="Выберите или введите..."
-                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
-                            <datalist id="objectsList"></datalist>
-                            <p id="sheetStatus" class="text-[10px] text-gray-600 mt-1">Загрузка списка из Google Sheets...</p>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Тип значения</label>
-                            <select id="valueTypeInput" 
-                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
-                                <option value="amount">Сумма (Руб.)</option>
-                                <option value="hours">Количество часов</option>
-                            </select>
-                        </div>
-                        <div id="amountContainer">
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Сумма (Руб.)</label>
-                            <input type="number" id="amountInput" placeholder="0.00" step="0.01" min="0"
-                                class="input-field w-full text-sm font-bold text-black" style="padding: 12px 14px;">
-                        </div>
-                        <div id="hoursContainer" class="hidden">
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Количество часов</label>
-                            <input type="number" id="hoursInput" placeholder="0" step="1" min="0"
-                                class="input-field w-full text-sm font-bold text-black" style="padding: 12px 14px;">
-                        </div>
-                        <div>
-                             <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Дата док-та</label>
-                             <input type="date" id="dateInput" 
-                                 class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
-                        </div>
-                    </div>
+                <div class="form-group">
+                    <label>Тип служебной записки:</label>
+                    <select id="documentTypeInput" class="input-field">
+                        <option value="compensation">Компенсация в заработную плату</option>
+                        <option value="tmc">ТМЦ</option>
+                    </select>
+                </div>
 
-                    <!-- 3. ПРИЛОЖЕНИЕ (ЧЕКИ) -->
-                    <div class="space-y-3 border-b border-black pb-4">
-                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Приложение (Чеки)</h3>
-                        <div>
-                            <label for="receiptsInput" class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold w-full justify-center" style="background: repeating-linear-gradient(45deg, #f0f0f0 0px, #f0f0f0 4px, rgba(240, 240, 240, 0.3) 4px, rgba(240, 240, 240, 0.3) 8px); color: #000; border: 1px solid #000; border-radius: 0; font-weight: 600;">
-                                <span>➕ Добавить чеки</span>
-                            </label>
-                            <input type="file" id="receiptsInput" multiple accept="image/*" class="hidden">
-                        </div>
-                        <div id="receiptsList" class="mt-2 space-y-2"></div>
-                        <p id="noReceiptsMsg" class="text-[10px] text-gray-600 text-center py-2 mt-2">Нет добавленных чеков</p>
-                    </div>
+                <div class="form-group">
+                    <label>Сотрудник:</label>
+                    <select id="employeeSelect" class="input-field">
+                        <option value="">-- Выберите сотрудника --</option>
+                    </select>
+                </div>
 
-                    <!-- 4. АДРЕСАТЫ -->
-                    <div class="space-y-3 border-b border-black pb-4">
-                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Кому</h3>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">ФИО</label>
-                            <input type="text" id="directorInput" value="Бочаровой А.В." 
-                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Должность</label>
-                            <input type="text" id="directorTitleInput" value="Директор региона Владимир" 
-                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
-                        </div>
-                    </div>
+                <div class="form-group" id="compensationPeriodContainer">
+                    <label>Расчетный период (месяц):</label>
+                    <select id="periodMonthInput" class="input-field">
+                        <option value="0">Январь</option>
+                        <option value="1">Февраль</option>
+                        <option value="2">Март</option>
+                        <option value="3">Апрель</option>
+                        <option value="4">Май</option>
+                        <option value="5">Июнь</option>
+                        <option value="6">Июль</option>
+                        <option value="7">Август</option>
+                        <option value="8">Сентябрь</option>
+                        <option value="9">Октябрь</option>
+                        <option value="10">Ноябрь</option>
+                        <option value="11">Декабрь</option>
+                    </select>
+                </div>
 
-                    <div class="space-y-3 border-b border-black pb-4">
-                        <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider">Копия</h3>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">ФИО</label>
-                            <input type="text" id="copyToInput" value="Клюкин С.Н." 
-                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                <div class="form-group" id="compensationPeriodYearContainer">
+                    <label>Расчетный период (год):</label>
+                    <select id="periodYearInput" class="input-field">
+                    </select>
+                </div>
+
+                <div class="form-group" id="commentContainer">
+                    <label>Комментарий (обязательно):</label>
+                    <textarea id="commentInput" rows="3" class="input-field" placeholder="Дополнительный комментарий..."></textarea>
+                </div>
+                
+                <div class="form-group hidden" id="tmcReasonContainer">
+                    <label>Основание (Прошу...):</label>
+                    <textarea id="reasonInput" rows="3" class="input-field" placeholder="Прошу возместить денежные средства за приобретение хоз.товаров"></textarea>
+                </div>
+                
+                <div class="form-group hidden" id="objectContainer">
+                    <label>Объект:</label>
+                    <input type="text" id="objectInput" list="objectsList" placeholder="Выберите или введите..." class="input-field">
+                    <datalist id="objectsList"></datalist>
+                    <p id="sheetStatus" style="font-size: 10px; color: #666; margin-top: 4px;">Загрузка списка из Google Sheets...</p>
+                </div>
+                
+                <div class="form-group hidden" id="valueTypeContainer">
+                    <label>Тип значения:</label>
+                    <select id="valueTypeInput" class="input-field">
+                        <option value="amount">Сумма (Руб.)</option>
+                        <option value="hours">Количество часов</option>
+                    </select>
+                </div>
+                <div class="form-group" id="amountContainer">
+                    <label>Сумма (Руб.):</label>
+                    <input type="number" id="amountInput" placeholder="0.00" step="0.01" min="0" class="input-field">
+                </div>
+                <div class="form-group hidden" id="hoursContainer">
+                    <label>Количество часов:</label>
+                    <input type="number" id="hoursInput" placeholder="0" step="1" min="0" class="input-field">
+                </div>
+                <div class="form-group">
+                    <label>Дата док-та:</label>
+                    <input type="date" id="dateInput" class="input-field">
+                </div>
+
+                <div class="form-group">
+                    <label>Приложение (Чеки):</label>
+                    <label for="receiptsInput" style="display: block; width: 100%; padding: 12px 24px; border: 1px solid #000; border-radius: 0; cursor: pointer; font-size: 0.8rem; font-weight: 600; text-align: center; background: repeating-linear-gradient(45deg, #f0f0f0 0px, #f0f0f0 4px, rgba(240, 240, 240, 0.3) 4px, rgba(240, 240, 240, 0.3) 8px); color: #000;">
+                        ➕ Добавить чеки
+                    </label>
+                    <input type="file" id="receiptsInput" multiple accept="image/*" style="display: none;">
+                    <div id="receiptsList" style="margin-top: 8px;"></div>
+                    <p id="noReceiptsMsg" style="font-size: 10px; color: #666; text-align: center; padding: 8px 0; margin: 0;">Нет добавленных чеков</p>
+                </div>
+
+                <div class="accordion-group">
+                    <div class="accordion-header" onclick="toggleAccordion('recipientAccordion')">
+                        <span>Кому</span>
+                        <span class="accordion-icon" id="recipientAccordionIcon">+</span>
+                    </div>
+                    <div class="accordion-content" id="recipientAccordion" style="display: none;">
+                        <div class="form-group">
+                            <label>Кому (ФИО):</label>
+                            <input type="text" id="directorInput" value="Бочаровой А.В." class="input-field">
                         </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1" style="font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px;">Должность</label>
-                            <input type="text" id="copyTitleInput" value="Территориальный менеджер" 
-                                class="input-field w-full text-sm text-black" style="padding: 12px 14px;">
+                        <div class="form-group">
+                            <label>Кому (Должность):</label>
+                            <input type="text" id="directorTitleInput" value="Директор региона Владимир" class="input-field">
                         </div>
                     </div>
-                </form>
+                </div>
+
+                <div class="accordion-group">
+                    <div class="accordion-header" onclick="toggleAccordion('copyAccordion')">
+                        <span>Копия</span>
+                        <span class="accordion-icon" id="copyAccordionIcon">+</span>
+                    </div>
+                    <div class="accordion-content" id="copyAccordion" style="display: none;">
+                        <div class="form-group">
+                            <label>Копия (ФИО):</label>
+                            <input type="text" id="copyToInput" value="Клюкин С.Н." class="input-field">
+                        </div>
+                        <div class="form-group">
+                            <label>Копия (Должность):</label>
+                            <input type="text" id="copyTitleInput" value="Территориальный менеджер" class="input-field">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-print" onclick="printDocument()">Печать</button>
+                </div>
             </div>
-        </aside>
 
-        <!-- Правая панель: Предпросмотр документа -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-8 flex justify-center items-start" style="background: white;">
+            <!-- Правая панель: Предпросмотр документа -->
+            <main class="flex-1 overflow-y-auto flex justify-center items-start" style="background: white;">
             
             <div id="pagesContainer" class="pages-container">
 
@@ -533,20 +741,25 @@
                             </div>
                         </div>
 
-                        <div class="font-medium text-[12pt] mt-4 mb-2">Предмет: Компенсация в заработную плату</div>
+                        <div class="font-medium text-[12pt] mt-4 mb-2">Предмет: <span id="previewSubject">Компенсация в заработную плату</span></div>
                     </div>
 
                     <div class="w-full border-b border-black mb-4"></div>
 
                     <div class="flex-1 flex flex-col pt-24">
-                        <div class="text-justify mb-1 indent-12 leading-relaxed text-[12pt]">
+                        <div class="text-justify mb-1 indent-12 leading-relaxed text-[12pt]" id="compensationReasonBlock">
                             <span id="previewReason">Прошу включить компенсацию в заработную плату за расчетный период</span>.
+                        </div>
+                        
+                        <div class="text-justify mb-8 indent-12 leading-relaxed text-[12pt] hidden" id="tmcReasonBlock">
+                            <span id="previewTmcReason">Прошу возместить денежные средства за приобретение хоз.товаров</span> для 
+                            <span id="previewObject" class="font-medium">__________________________________________</span>.
                         </div>
 
                         <div id="previewComment" class="text-justify mb-8 leading-relaxed text-[12pt]"></div>
 
                         <div id="previewAmountBlock" class="text-justify mb-2 leading-relaxed text-[12pt]">
-                            Сумма компенсации – <span id="previewAmountNum" class="font-bold">____</span> руб.
+                            <span id="previewAmountLabel">Сумма компенсации</span> – <span id="previewAmountNum" class="font-bold">____</span> руб.
                         </div>
                         <div id="previewHoursBlock" class="text-justify mb-2 leading-relaxed text-[12pt] hidden">
                             Количество часов – <span id="previewHoursNum" class="font-bold">____</span>
@@ -569,6 +782,7 @@
                 </div>
             </div>
         </main>
+        </div>
     </div>
 
     <script>
@@ -720,6 +934,7 @@
         }
 
         const state = {
+            documentType: "compensation", // "compensation" или "tmc"
             director: "Бочаровой А.В.",
             directorTitle: "Директор региона Владимир",
             employee: "",
@@ -728,6 +943,7 @@
             copyTo: "Клюкин С.Н.",
             copyTitle: "Территориальный менеджер",
             reasonText: "Прошу включить компенсацию в заработную плату за расчетный период",
+            tmcReasonText: "Прошу возместить денежные средства за приобретение хоз.товаров",
             comment: "",
             date: "",
             outNum: "",
@@ -885,7 +1101,87 @@
             renderReceiptPages();
         };
 
+        // Функция печати с правильным именем файла
+        function printDocument() {
+            // Обновляем документ перед печатью
+            updateDocument();
+            
+            // Формируем название файла
+            const docTypeText = state.documentType === 'compensation' 
+                ? 'Компенсация в заработную плату' 
+                : 'ТМЦ';
+            const employeeName = state.employee || 'Не указан';
+            const fileName = `СЗ по ${docTypeText} от ${employeeName}`;
+            
+            // Сохраняем оригинальный title
+            const originalTitle = document.title;
+            
+            // Устанавливаем новый title для имени файла при сохранении в PDF
+            document.title = fileName;
+            
+            // Вызываем печать
+            window.print();
+            
+            // Восстанавливаем оригинальный title после небольшой задержки
+            setTimeout(() => {
+                document.title = originalTitle;
+            }, 1000);
+        }
+
+        // Функция переключения типов документа
+        function toggleDocumentType() {
+            const docTypeSelect = document.getElementById('documentTypeInput');
+            if (!docTypeSelect) return;
+            
+            docTypeSelect.addEventListener('change', (e) => {
+                state.documentType = e.target.value;
+                updateDocumentTypeVisibility();
+                updateDocument();
+            });
+        }
+
+        function updateDocumentTypeVisibility() {
+            const isCompensation = state.documentType === 'compensation';
+            const isTmc = state.documentType === 'tmc';
+
+            // Поля для компенсации
+            const compensationPeriodContainer = document.getElementById('compensationPeriodContainer');
+            const compensationPeriodYearContainer = document.getElementById('compensationPeriodYearContainer');
+            const commentContainer = document.getElementById('commentContainer');
+            const valueTypeContainer = document.getElementById('valueTypeContainer');
+            
+            // Поля для ТМЦ
+            const tmcReasonContainer = document.getElementById('tmcReasonContainer');
+            const objectContainer = document.getElementById('objectContainer');
+            
+            if (compensationPeriodContainer) compensationPeriodContainer.classList.toggle('hidden', !isCompensation);
+            if (compensationPeriodYearContainer) compensationPeriodYearContainer.classList.toggle('hidden', !isCompensation);
+            if (commentContainer) commentContainer.classList.toggle('hidden', !isCompensation);
+            if (valueTypeContainer) valueTypeContainer.classList.toggle('hidden', !isCompensation);
+            
+            if (tmcReasonContainer) tmcReasonContainer.classList.toggle('hidden', !isTmc);
+            if (objectContainer) objectContainer.classList.toggle('hidden', !isTmc);
+
+            // Обновление значений "Копия" в зависимости от типа документа
+            if (isTmc) {
+                state.copyTo = "Леонова О.В.";
+                state.copyTitle = "Бухгалтер";
+            } else {
+                state.copyTo = "Клюкин С.Н.";
+                state.copyTitle = "Территориальный менеджер";
+            }
+
+            // Обновление полей ввода
+            const elCopyTo = document.getElementById('copyToInput');
+            const elCopyTitle = document.getElementById('copyTitleInput');
+            if (elCopyTo) elCopyTo.value = state.copyTo;
+            if (elCopyTitle) elCopyTitle.value = state.copyTitle;
+        }
+
         function updateDocument() {
+            // Чтение типа документа
+            const elDocumentType = document.getElementById('documentTypeInput');
+            if (elDocumentType) state.documentType = elDocumentType.value;
             // Чтение данных из полей
             const elDirector = document.getElementById('directorInput');
             const elDirectorTitle = document.getElementById('directorTitleInput');
@@ -916,14 +1212,51 @@
             if (elValueType) state.valueType = elValueType.value;
             if (elPeriodMonth !== null) state.periodMonth = parseInt(elPeriodMonth.value) || 11;
             if (elPeriodYear !== null) state.periodYear = parseInt(elPeriodYear.value) || new Date().getFullYear();
-            if (elObject) state.object = elObject.value;
             if (elComment) state.comment = elComment.value;
             if (elDate) state.date = elDate.value;
+            if (elReason) state.tmcReasonText = elReason.value || "Прошу возместить денежные средства за приобретение хоз.товаров";
 
-            // Формирование основания с расчетным периодом
-            const months = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
-            const periodText = `${months[state.periodMonth]} ${state.periodYear}`;
-            state.reasonText = `Прошу включить компенсацию в заработную плату за ${periodText}`;
+            // Для ТМЦ объект берется из подразделения сотрудника, иначе из поля ввода
+            if (state.documentType === 'tmc') {
+                state.object = state.employeeDepartment || '';
+                // Обновляем поле ввода объекта
+                if (elObject) elObject.value = state.object;
+            } else {
+                if (elObject) state.object = elObject.value;
+            }
+
+            // Формирование основания с расчетным периодом для компенсации
+            if (state.documentType === 'compensation') {
+                const months = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+                const periodText = `${months[state.periodMonth]} ${state.periodYear}`;
+                state.reasonText = `Прошу включить компенсацию в заработную плату за ${periodText}`;
+            }
+
+            // Обновление предмета
+            const previewSubject = document.getElementById('previewSubject');
+            if (previewSubject) {
+                previewSubject.textContent = state.documentType === 'compensation' 
+                    ? 'Компенсация в заработную плату' 
+                    : 'ТМЦ';
+            }
+
+            // Переключение между блоками основания
+            const compensationReasonBlock = document.getElementById('compensationReasonBlock');
+            const tmcReasonBlock = document.getElementById('tmcReasonBlock');
+            
+            if (state.documentType === 'compensation') {
+                if (compensationReasonBlock) compensationReasonBlock.classList.remove('hidden');
+                if (tmcReasonBlock) tmcReasonBlock.classList.add('hidden');
+            } else {
+                if (compensationReasonBlock) compensationReasonBlock.classList.add('hidden');
+                if (tmcReasonBlock) tmcReasonBlock.classList.remove('hidden');
+                
+                // Обновление текста ТМЦ основания
+                const previewTmcReason = document.getElementById('previewTmcReason');
+                const previewObject = document.getElementById('previewObject');
+                if (previewTmcReason) previewTmcReason.textContent = state.tmcReasonText;
+                if (previewObject) previewObject.textContent = state.object || "__________________________________________";
+            }
 
             // Обновление превью
             const previewIds = {
@@ -958,13 +1291,21 @@
                 }
             }
 
-            // Переключение между суммой и часами
+            // Обновление метки суммы
+            const previewAmountLabel = document.getElementById('previewAmountLabel');
+            if (previewAmountLabel) {
+                previewAmountLabel.textContent = state.documentType === 'compensation' 
+                    ? 'Сумма компенсации' 
+                    : 'Сумма к возмещению';
+            }
+
+            // Переключение между суммой и часами (только для компенсации)
             const amountBlock = document.getElementById('previewAmountBlock');
             const hoursBlock = document.getElementById('previewHoursBlock');
             const amountTextBlock = document.getElementById('previewAmountTextBlock');
             const receiptsText = document.getElementById('previewReceiptsText');
             
-            if (state.valueType === 'hours') {
+            if (state.documentType === 'compensation' && state.valueType === 'hours') {
                 // Показываем часы, скрываем сумму и "Чеки прилагаю"
                 if (amountBlock) amountBlock.classList.add('hidden');
                 if (hoursBlock) hoursBlock.classList.remove('hidden');
@@ -999,10 +1340,10 @@
                 }
             }
 
-            // Обновление комментария
+            // Обновление комментария (только для компенсации)
             const commentEl = document.getElementById('previewComment');
             if (commentEl) {
-                if (state.comment && state.comment.trim()) {
+                if (state.documentType === 'compensation' && state.comment && state.comment.trim()) {
                     commentEl.textContent = state.comment.trim();
                     commentEl.classList.remove('hidden');
                 } else {
@@ -1029,6 +1370,22 @@
             }
         }
 
+        // Функция переключения аккордеона
+        function toggleAccordion(accordionId) {
+            const content = document.getElementById(accordionId);
+            const icon = document.getElementById(accordionId + 'Icon');
+            
+            if (!content || !icon) return;
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.textContent = '−';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '+';
+            }
+        }
+
         // Переключение между суммой и часами
         function toggleValueType() {
             const valueType = document.getElementById('valueTypeInput');
@@ -1050,6 +1407,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
+            // Инициализация типа документа
+            const elDocumentType = document.getElementById('documentTypeInput');
+            if (elDocumentType) elDocumentType.value = state.documentType;
+            toggleDocumentType();
+            updateDocumentTypeVisibility();
+            
             // Инициализация полей правильными значениями
             const elDirector = document.getElementById('directorInput');
             if (elDirector) elDirector.value = state.director;
@@ -1073,7 +1436,7 @@
             if (elDate) elDate.valueAsDate = new Date();
             
             const elReason = document.getElementById('reasonInput');
-            if (elReason) elReason.value = state.reasonText;
+            if (elReason) elReason.value = state.tmcReasonText;
             
             // Обнуление полей при обновлении страницы
             const elEmployeeSelect = document.getElementById('employeeSelect');
