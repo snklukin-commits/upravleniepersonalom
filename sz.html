@@ -20,14 +20,13 @@
             background: white;
             padding: 20px;
             min-height: 100vh;
-            zoom: 0.85;
-            transform-origin: top left;
         }
         
         /* Эмуляция листа A4 */
         .a4-page {
             width: 210mm;
             min-height: 297mm;
+            max-height: 297mm;
             padding: 20mm;
             margin: 0; 
             background: white;
@@ -40,6 +39,7 @@
             position: relative;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
         /* Сетка заголовка документа */
@@ -100,7 +100,7 @@
         }
         .receipt-img {
             max-width: 100%;
-            max-height: 250mm; 
+            max-height: 257mm; 
             object-fit: contain;
             border: 1px solid #000; 
         }
@@ -498,15 +498,22 @@
                 margin: 0 !important;
                 width: 100% !important;
                 min-height: 297mm !important;
+                max-height: 297mm !important;
                 page-break-inside: avoid !important;
                 padding: 20mm !important;
                 display: block !important;
                 background: white !important;
                 position: relative !important;
                 box-sizing: border-box !important;
+                overflow: hidden !important;
             }
             
-            /* Разрыв страницы только для страниц, которые не являются последними */
+            /* Заявление должно помещаться на одну страницу */
+            #documentPage {
+                height: 297mm !important;
+            }
+            
+            /* Разрыв страницы после каждой страницы, кроме последней */
             .a4-page:not(:last-child) {
                 page-break-after: always !important;
             }
@@ -516,16 +523,34 @@
                 page-break-after: avoid !important;
             }
             
-            .pages-container > .a4-page:last-child {
-                page-break-after: avoid !important;
+            /* Первая страница (заявление) не должна иметь разрыв перед ней */
+            #documentPage {
+                page-break-before: avoid !important;
+            }
+            
+            /* Все страницы после заявления (чеки) должны начинаться с новой страницы */
+            #documentPage ~ .a4-page {
+                page-break-before: always !important;
             }
             
             .receipt-img {
                 border: none !important;
                 max-width: 100% !important;
                 max-height: 257mm !important;
+                width: auto !important;
                 height: auto !important;
                 object-fit: contain !important;
+            }
+            
+            /* Контейнер для чеков на отдельной странице */
+            .receipt-container {
+                width: 100% !important;
+                height: 100% !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                padding: 0 !important;
             }
             
             #previewAmountTextBlock {
@@ -747,7 +772,7 @@
 
                     <div class="w-full border-b border-black mb-4"></div>
 
-                    <div class="flex-1 flex flex-col pt-24">
+                    <div class="flex-1 flex flex-col pt-24" style="flex-shrink: 1;">
                         <div class="text-justify mb-1 indent-12 leading-relaxed text-[12pt]" id="compensationReasonBlock">
                             <span id="previewReason">Прошу включить компенсацию в заработную плату за расчетный период</span>.
                         </div>
@@ -1121,7 +1146,9 @@
             const container = document.getElementById('pagesContainer');
             const mainPage = document.getElementById('documentPage');
             if (!container || !mainPage) return;
+            // Удаляем все страницы с чеками
             while (mainPage.nextElementSibling) mainPage.nextElementSibling.remove();
+            // Создаем отдельную страницу для каждого чека
             state.receipts.forEach((r, idx) => {
                 const page = document.createElement('div');
                 page.className = 'a4-page animate-fade-in-up';
