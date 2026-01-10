@@ -1381,7 +1381,10 @@
             if (elAmount) state.amount = parseFloat(elAmount.value) || 0;
             if (elHours) state.hours = parseFloat(elHours.value) || 0;
             if (elValueType) state.valueType = elValueType.value;
-            if (elPeriodMonth !== null) state.periodMonth = parseInt(elPeriodMonth.value) || 11;
+            if (elPeriodMonth !== null) {
+                const parsed = parseInt(elPeriodMonth.value);
+                state.periodMonth = (!isNaN(parsed) && parsed >= 0 && parsed <= 11) ? parsed : 11;
+            }
             if (elPeriodYear !== null) state.periodYear = parseInt(elPeriodYear.value) || new Date().getFullYear();
             if (elComment) state.comment = elComment.value;
             if (elDate) state.date = elDate.value;
