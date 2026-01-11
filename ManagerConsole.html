@@ -790,10 +790,13 @@
                     mainPharmacyId = String(employeeRef.pharmacy);
                     
                     // Ищем запись сотрудника для основной аптеки из справочника
+                    // Проверяем и по ID, и по номеру аптеки, так как в employeeRef.pharmacy может быть как ID, так и номер
                     mainWork = employeeData.find(e => {
                         const empPharmacyId = String(e.pharmacyId || '');
-                        // Сравниваем по ID аптеки (pharmacyId должен совпадать с pharmacy из справочника)
-                        return empPharmacyId === mainPharmacyId;
+                        const empPharmacyNumber = String(e.pharmacyNumber || '');
+                        const mainPharmIdStr = String(mainPharmacyId);
+                        // Сравниваем по ID и по номеру аптеки
+                        return empPharmacyId === mainPharmIdStr || empPharmacyNumber === mainPharmIdStr;
                     });
                 }
                 
@@ -1014,9 +1017,7 @@
                                 <thead>
                                     <tr>
                                         <th>Сумма / Время</th>
-                                        <th>Тип</th>
                                         <th>Комментарий</th>
-                                        <th>Дата</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -1026,15 +1027,11 @@
                             const valueText = comp.valueType === 'hours' 
                                 ? `${comp.value} часов` 
                                 : `${comp.value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} руб.`;
-                            const typeText = comp.valueType === 'hours' ? 'Часы' : 'Сумма';
-                            const dateText = comp.date ? new Date(comp.date).toLocaleDateString('ru-RU') : '-';
                             
                             html += `
                                 <tr>
                                     <td>${valueText}</td>
-                                    <td>${typeText}</td>
                                     <td>${comp.comment || '-'}</td>
-                                    <td>${dateText}</td>
                                 </tr>
                             `;
                         });
