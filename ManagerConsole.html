@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Консоль менеджера</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: white;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 0;
+            box-shadow: none;
+            border: 1px solid #000;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #000;
+            padding: 15px 25px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0 0px,
+                #f0f0f0 4px,
+                rgba(240, 240, 240, 0.3) 4px,
+                rgba(240, 240, 240, 0.3) 8px
+            );
+            border: 1px solid #000;
+            display: inline-block;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .select-wrapper {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .select-wrapper label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        select, input[type="number"] {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #000;
+            border-radius: 0;
+            font-size: 14px;
+            background: repeating-linear-gradient(
+                45deg,
+                #fafbff 0px,
+                #fafbff 4px,
+                rgba(250, 251, 255, 0.3) 4px,
+                rgba(250, 251, 255, 0.3) 8px
+            );
+            color: #000;
+            cursor: pointer;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #000;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+        }
+        
+        .filters-wrapper {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f8f9ff 0px,
+                #f8f9ff 4px,
+                rgba(248, 249, 255, 0.3) 4px,
+                rgba(248, 249, 255, 0.3) 8px
+            );
+            border: 1px solid #000;
+        }
+        
+        .filters-wrapper label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+            color: #333;
+        }
+        
+        .filters-grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-item input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        .filter-item label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .employee-section {
+            margin-bottom: 30px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f8f9ff 0px,
+                #f8f9ff 4px,
+                rgba(248, 249, 255, 0.3) 4px,
+                rgba(248, 249, 255, 0.3) 8px
+            );
+            border: 1px solid #000;
+            padding: 20px;
+        }
+        
+        .employee-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #000;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        
+        .employee-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            padding: 10px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+            border: 1px solid #000;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #000;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 20px 0 15px 0;
+            color: #000;
+            padding: 10px;
+            background: repeating-linear-gradient(
+                45deg,
+                #e8ecf5 0px,
+                #e8ecf5 4px,
+                rgba(232, 236, 245, 0.3) 4px,
+                rgba(232, 236, 245, 0.3) 8px
+            );
+            border: 1px solid #000;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            border: 1px solid #000;
+            padding: 10px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background: repeating-linear-gradient(
+                45deg,
+                #d4f4dd 0px,
+                #d4f4dd 4px,
+                rgba(212, 244, 221, 0.3) 4px,
+                rgba(212, 244, 221, 0.3) 8px
+            );
+            font-weight: 600;
+            color: #000;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: repeating-linear-gradient(
+                45deg,
+                #f9f9f9 0px,
+                #f9f9f9 4px,
+                rgba(249, 249, 249, 0.3) 4px,
+                rgba(249, 249, 249, 0.3) 8px
+            );
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .summary-card {
+            background: repeating-linear-gradient(
+                45deg,
+                #ffffff 0px,
+                #ffffff 4px,
+                rgba(255, 255, 255, 0.3) 4px,
+                rgba(255, 255, 255, 0.3) 8px
+            );
+            border: 1px solid #000;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .summary-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #000;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        
+        .summary-item {
+            padding: 8px;
+            background: repeating-linear-gradient(
+                45deg,
+                #f9f9f9 0px,
+                #f9f9f9 4px,
+                rgba(249, 249, 249, 0.3) 4px,
+                rgba(249, 249, 249, 0.3) 8px
+            );
+            border: 1px solid #000;
+        }
+        
+        .summary-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .summary-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">КОНСОЛЬ МЕНЕДЖЕРА</div>
+        </div>
+        
+        <div class="controls">
+            <div class="select-wrapper">
+                <label>Месяц:</label>
+                <select id="monthSelect">
+                    <option value="0">Январь</option>
+                    <option value="1">Февраль</option>
+                    <option value="2">Март</option>
+                    <option value="3">Апрель</option>
+                    <option value="4">Май</option>
+                    <option value="5">Июнь</option>
+                    <option value="6">Июль</option>
+                    <option value="7">Август</option>
+                    <option value="8">Сентябрь</option>
+                    <option value="9">Октябрь</option>
+                    <option value="10">Ноябрь</option>
+                    <option value="11" selected>Декабрь</option>
+                </select>
+            </div>
+            <div class="select-wrapper">
+                <label>Год:</label>
+                <input type="number" id="yearSelect" value="2025" min="2020" max="2030">
+            </div>
+        </div>
+        
+        <div class="filters-wrapper">
+            <label>Фильтры:</label>
+            <div class="filters-grid">
+                <div class="filter-item">
+                    <input type="radio" id="filterAllEmployees" name="employeeFilter" value="all" checked>
+                    <label for="filterAllEmployees">Все сотрудники</label>
+                </div>
+                <div class="filter-item">
+                    <input type="radio" id="filterWithSubworkCompensation" name="employeeFilter" value="subwork">
+                    <label for="filterWithSubworkCompensation">С подработкой/компенсацией к ЗП</label>
+                </div>
+                <div class="filter-item">
+                    <input type="radio" id="filterCompensationSZ" name="employeeFilter" value="compensation">
+                    <label for="filterCompensationSZ">Компенсация к СЗ</label>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loadingState" class="loading" style="display: none;">
+            Загрузка данных...
+        </div>
+        
+        <div id="contentArea"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCnltG-ciUwtpZhFaAhTzLI_cjtVZURgEo",
+            authDomain: "grafiki-aptek.firebaseapp.com",
+            projectId: "grafiki-aptek",
+            storageBucket: "grafiki-aptek.firebasestorage.app",
+            messagingSenderId: "372041187072",
+            appId: "1:372041187072:web:14b4326e85d3f347523de5",
+            measurementId: "G-2KTEGH1MFK",
+            databaseURL: "https://grafiki-aptek-default-rtdb.firebaseio.com/"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Global variables
+        let allEmployees = {};
+        let pharmacyReference = [];
+        let employeeReference = [];
+        let compensationData = {};
+        let absenceData = {};
+        let currentMonth = 11; // December
+        let currentYear = 2025;
+        
+        // Filter state (only one filter can be selected)
+        let selectedFilter = 'all'; // 'all', 'subwork', 'compensation'
+
+        // Функция для сохранения значений в Firebase
+        async function firebaseSetItem(key, value) {
+            try {
+                const ref = database.ref('appData/' + key);
+                await ref.set(value);
+                console.log('✅ Firebase: сохранено', key);
+                return true;
+            } catch (error) {
+                console.error('❌ Firebase setItem error:', error);
+                return false;
+            }
+        }
+
+        // Инициализация переменных из Firebase
+        async function initializeVariables() {
+            try {
+                const savedMonth = await firebaseGetItem('savedCurrentMonth');
+                const savedYear = await firebaseGetItem('savedCurrentYear');
+                
+                if (savedMonth !== null && savedMonth !== undefined) {
+                    const monthValue = parseInt(savedMonth);
+                    if (!isNaN(monthValue) && monthValue >= 0 && monthValue <= 11) {
+                        currentMonth = monthValue;
+                    }
+                }
+                if (savedYear !== null && savedYear !== undefined) {
+                    const yearValue = parseInt(savedYear);
+                    if (!isNaN(yearValue) && yearValue > 2000 && yearValue < 3000) {
+                        currentYear = yearValue;
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки сохраненных значений из Firebase:', error);
+            }
+        }
+
+        // Функция для безопасного кодирования ключей Firebase
+        function encodeFirebaseKey(key) {
+            return String(key)
+                .replace(/\./g, '_DOT_')
+                .replace(/#/g, '_HASH_')
+                .replace(/\$/g, '_DOLLAR_')
+                .replace(/\//g, '_SLASH_')
+                .replace(/\[/g, '_LBRACKET_')
+                .replace(/\]/g, '_RBRACKET_');
+        }
+
+        // Функция для декодирования ключей Firebase
+        function decodeFirebaseKey(key) {
+            return String(key)
+                .replace(/_DOT_/g, '.')
+                .replace(/_HASH_/g, '#')
+                .replace(/_DOLLAR_/g, '$')
+                .replace(/_SLASH_/g, '/')
+                .replace(/_LBRACKET_/g, '[')
+                .replace(/_RBRACKET_/g, ']');
+        }
+
+        // Firebase functions
+        async function firebaseGetItem(key) {
+            try {
+                const ref = database.ref('appData/' + key);
+                const snapshot = await ref.once('value');
+                return snapshot.exists() ? snapshot.val() : null;
+            } catch (error) {
+                console.error('Firebase getItem error:', error);
+                return null;
+            }
+        }
+
+        // Helper functions
+        function getDaysInMonth(month, year) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getDayOfWeek(day, month, year) {
+            const date = new Date(year, month, day);
+            let dayNum = date.getDay();
+            // Возвращаем как в Grafick: 0=понедельник, 6=воскресенье
+            return (dayNum === 0) ? 6 : dayNum - 1;
+        }
+        
+        function isWeekend(day, month, year) {
+            const dow = getDayOfWeek(day, month, year);
+            return dow === 5 || dow === 6; // Суббота или воскресенье
+        }
+        
+        function parseSchedule(scheduleStr) {
+            if (!scheduleStr) return null;
+            const parts = scheduleStr.split('/');
+            if (parts.length === 2) {
+                return {
+                    workDays: parseInt(parts[0]),
+                    offDays: parseInt(parts[1])
+                };
+            }
+            return null;
+        }
+        
+        function isStandardWorkDay(employee, day, month, year) {
+            if (!employee.schedule) return null;
+            const schedule = parseSchedule(employee.schedule);
+            if (!schedule) return null;
+            
+            let startDay = employee.scheduleStartDay || 1;
+            // Fix for days before startDay
+            if (day < startDay) {
+                if (schedule.workDays === 5 && schedule.offDays === 2) {
+                    return isWeekend(day, month, year) ? false : null;
+                }
+                return null;
+            }
+            
+            if (schedule.workDays === 5 && schedule.offDays === 2) {
+                return !isWeekend(day, month, year);
+            }
+            
+            const dayInCycle = (day - startDay) % (schedule.workDays + schedule.offDays);
+            return dayInCycle < schedule.workDays;
+        }
+        
+        function getDisplayValue(employee, day, month, year) {
+            // Логика как в Grafick: сначала проверяем dayOverrides, потом стандартный график
+            const overrides = employee.dayOverrides || {};
+            
+            // Проверяем оба формата ключа (число и строка), так как Firebase может сохранять по-разному
+            let dayValue = overrides[day];
+            if (dayValue === undefined || dayValue === null) {
+                dayValue = overrides[String(day)];
+            }
+            
+            if (dayValue !== undefined && dayValue !== null) {
+                return dayValue === "" ? null : dayValue;
+            }
+            
+            // Если нет в dayOverrides, вычисляем по стандартному графику (как в Grafick)
+            const isWork = isStandardWorkDay(employee, day, month, year);
+            if (isWork === true) {
+                if (employee.startHour !== undefined && employee.endHour !== undefined) {
+                    return employee.startHour + "-" + employee.endHour;
+                }
+            }
+            return null;
+        }
+        
+        function getAbsenceForDay(employeeName, day, month, year) {
+            if (!absenceData || !absenceData[employeeName]) return null;
+            
+            const checkDate = new Date(year, month, day);
+            for (let absence of absenceData[employeeName]) {
+                const startDate = new Date(absence.startDate);
+                const endDate = new Date(absence.endDate);
+                if (checkDate >= startDate && checkDate <= endDate) {
+                    return {
+                        type: absence.type,
+                        startDate: absence.startDate,
+                        endDate: absence.endDate
+                    };
+                }
+            }
+            return null;
+        }
+
+        function parseShift(shiftValue) {
+            if (!shiftValue || shiftValue === '') return null;
+            const match = shiftValue.match(/(\d+)-(\d+)/);
+            if (match) {
+                const start = parseInt(match[1]);
+                const end = parseInt(match[2]);
+                // Правильный расчет часов: с 9 до 18 = 9 часов работы минус 1 час на обед = 8 часов
+                let hours = end - start;
+                // Вычитаем 1 час на обеденный перерыв
+                hours = Math.max(0, hours - 1);
+                if (hours < 0 || hours > 24) return null;
+                return { start, end, hours };
+            }
+            return null;
+        }
+
+        function calculateEmployeeStats(employee, month, year) {
+            if (!employee) {
+                return { totalShifts: 0, totalHours: 0, shifts: [] };
+            }
+            
+            const daysInMonth = getDaysInMonth(month, year);
+            let totalShifts = 0;
+            let totalHours = 0;
+            const shifts = [];
+            
+            // Используем ту же логику, что и в EmployeeManager: сначала проверяем dayOverrides,
+            // если нет - вычисляем по стандартному графику (schedule)
+            // Также исключаем дни отсутствия
+            
+            // Проходим по всем дням месяца
+            for (let day = 1; day <= daysInMonth; day++) {
+                // Пропускаем дни отсутствия
+                const absence = getAbsenceForDay(employee.name, day, month, year);
+                if (absence) {
+                    continue;
+                }
+                
+                // Получаем значение смены (как в Grafick - сначала из dayOverrides, потом из графика)
+                const shiftValue = getDisplayValue(employee, day, month, year);
+                
+                // Если есть значение смены - парсим и добавляем
+                if (shiftValue && shiftValue !== '') {
+                    const shift = parseShift(shiftValue);
+                    if (shift) {
+                        totalShifts++;
+                        totalHours += shift.hours;
+                        shifts.push({
+                            day: day,
+                            start: shift.start,
+                            end: shift.end,
+                            hours: shift.hours,
+                            type: (employee.dayOverrides && employee.dayOverrides[day] !== undefined) ? 'firebase' : 'schedule'
+                        });
+                    }
+                }
+            }
+            
+            return { totalShifts, totalHours, shifts };
+        }
+
+        function getScheduleKey(year, month, pharmacyId) {
+            return 'scheduleData_' + (pharmacyId || 'default') + '_' + year + '_' + month;
+        }
+
+        // Load data
+        async function loadData() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('contentArea').innerHTML = '';
+            
+            try {
+                // Load reference data
+                const refData = await firebaseGetItem('scheduleReferenceData');
+                if (refData) {
+                    const data = typeof refData === 'string' ? JSON.parse(refData) : refData;
+                    pharmacyReference = data.pharmacyReference || [];
+                    employeeReference = data.employeeReference || [];
+                } else {
+                    const pharmaData = await firebaseGetItem('pharmacyReference');
+                    pharmacyReference = pharmaData || [];
+                    const empRefData = await firebaseGetItem('employeeReference');
+                    employeeReference = empRefData || [];
+                }
+                
+                // Load compensation data
+                const compensationDataRaw = await firebaseGetItem('compensationData');
+                const rawData = compensationDataRaw ? (typeof compensationDataRaw === 'string' ? JSON.parse(compensationDataRaw) : compensationDataRaw) : {};
+                compensationData = {};
+                if (rawData && typeof rawData === 'object') {
+                    for (const safeKey in rawData) {
+                        const originalKey = decodeFirebaseKey(safeKey);
+                        compensationData[originalKey] = rawData[safeKey];
+                    }
+                }
+                
+                // Load absence data
+                const absenceDataRaw = await firebaseGetItem('absenceData');
+                absenceData = absenceDataRaw ? (typeof absenceDataRaw === 'string' ? JSON.parse(absenceDataRaw) : absenceDataRaw) : {};
+                
+                allEmployees = {};
+                
+                if (pharmacyReference.length === 0) {
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('contentArea').innerHTML = '<div class="empty-state">Нет данных о аптеках. Проверьте подключение к Firebase.</div>';
+                    return;
+                }
+                
+                // Load data for all pharmacies for current month
+                for (const pharmacy of pharmacyReference) {
+                    const pharmacyId = pharmacy.id || pharmacy.number;
+                    const key = getScheduleKey(currentYear, currentMonth, pharmacyId);
+                    
+                    const data = await firebaseGetItem(key);
+                    if (data) {
+                        const scheduleData = typeof data === 'string' ? JSON.parse(data) : data;
+                        if (scheduleData && scheduleData.employees) {
+                            const employees = Array.isArray(scheduleData.employees) ? scheduleData.employees : [];
+                            
+                            employees.forEach(emp => {
+                                if (!emp.name) return;
+                                
+                                if (!allEmployees[emp.name]) {
+                                    allEmployees[emp.name] = [];
+                                }
+                                
+                                const isSubcontractor = emp.isSubcontractor === true || 
+                                                       emp.isSubcontractor === 1 || 
+                                                       emp.isSubcontractor === 'true' || 
+                                                       emp.isSubcontractor === '1';
+                                
+                                const employeeRecord = {
+                                    ...emp,
+                                    pharmacyId: pharmacyId,
+                                    pharmacyNumber: pharmacy.number,
+                                    pharmacyName: `Аптека №${pharmacy.number}`,
+                                    isMain: !isSubcontractor
+                                };
+                                
+                                allEmployees[emp.name].push(employeeRecord);
+                            });
+                        }
+                    }
+                }
+                
+                // Display data
+                displayAllData();
+                
+                document.getElementById('loadingState').style.display = 'none';
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('contentArea').innerHTML = '<div class="empty-state">Ошибка загрузки данных: ' + error.message + '</div>';
+            }
+        }
+
+        function formatFIO(fullName) {
+            if (!fullName) return '';
+            if (fullName.match(/[А-ЯЁ]\.[А-ЯЁ]\./)) {
+                return fullName;
+            }
+            const parts = fullName.trim().split(/\s+/);
+            if (parts.length < 2) return fullName;
+            const lastName = parts[0];
+            const initials = parts.slice(1).map(part => {
+                if (part.length > 0) {
+                    return part[0].toUpperCase() + '.';
+                }
+                return '';
+            }).join('');
+            return `${lastName} ${initials}`.trim();
+        }
+
+        function formatDate(day, month, year) {
+            const d = new Date(year, month, day);
+            const dayStr = String(day).padStart(2, '0');
+            const monthStr = String(month + 1).padStart(2, '0');
+            return `${dayStr}.${monthStr}.${year}`;
+        }
+
+        function getMonthName(month) {
+            const months = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
+                          'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            return months[month];
+        }
+
+        function displayAllData() {
+            const contentArea = document.getElementById('contentArea');
+            const employeeNames = Object.keys(allEmployees).sort();
+            
+            if (employeeNames.length === 0) {
+                contentArea.innerHTML = '<div class="empty-state">Нет данных о сотрудниках за выбранный месяц.</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            employeeNames.forEach(employeeName => {
+                const employeeData = allEmployees[employeeName];
+                
+                // Find main pharmacy from reference
+                let mainPharmacyId = null;
+                let mainPharmacyName = 'Не указана';
+                let mainPosition = '-';
+                const employeeRef = employeeReference.find(e => e.name === employeeName);
+                
+                if (employeeRef) {
+                    // Получаем должность из справочника
+                    mainPosition = employeeRef.position || '-';
+                    
+                    // Получаем основную аптеку из справочника
+                    if (employeeRef.pharmacy) {
+                        mainPharmacyId = String(employeeRef.pharmacy);
+                        const mainPharmacy = pharmacyReference.find(p => String(p.id) === mainPharmacyId || String(p.number) === mainPharmacyId);
+                        if (mainPharmacy) {
+                            mainPharmacyName = `Аптека №${mainPharmacy.number}`;
+                        }
+                    }
+                }
+                
+                // Determine main work ИСКЛЮЧИТЕЛЬНО из справочника employeeReference
+                let mainWork = null;
+                if (employeeRef && employeeRef.pharmacy) {
+                    mainPharmacyId = String(employeeRef.pharmacy);
+                    
+                    // Ищем запись сотрудника для основной аптеки из справочника
+                    mainWork = employeeData.find(e => {
+                        const empPharmacyId = String(e.pharmacyId || '');
+                        // Сравниваем по ID аптеки (pharmacyId должен совпадать с pharmacy из справочника)
+                        return empPharmacyId === mainPharmacyId;
+                    });
+                }
+                
+                // Все остальные аптеки - это подработки
+                const subWorks = mainWork 
+                    ? employeeData.filter(e => {
+                        // Исключаем основную работу
+                        return e !== mainWork && 
+                               !(e.pharmacyId === mainWork.pharmacyId && e.pharmacyNumber === mainWork.pharmacyNumber);
+                      })
+                    : employeeData; // Если основной работы нет, все аптеки считаются подработками
+                
+                // Get compensations
+                let employeeCompensations = [];
+                const formattedName = formatFIO(employeeName);
+                
+                // Try to find compensations by different name formats
+                let compData = compensationData[employeeName] || compensationData[formattedName];
+                if (compData && typeof compData === 'object') {
+                    for (const periodKey in compData) {
+                        const periodComps = compData[periodKey];
+                        if (Array.isArray(periodComps)) {
+                            periodComps.forEach(comp => {
+                                employeeCompensations.push({
+                                    ...comp,
+                                    period: periodKey
+                                });
+                            });
+                        }
+                    }
+                }
+                
+                // Calculate main work stats
+                let mainShifts = 0;
+                let mainHours = 0;
+                let mainShiftDetails = [];
+                
+                if (mainWork) {
+                    const mainStats = calculateEmployeeStats(mainWork, currentMonth, currentYear);
+                    mainShifts = mainStats.totalShifts;
+                    mainHours = mainStats.totalHours;
+                    mainShiftDetails = mainStats.shifts;
+                }
+                
+                // Calculate sub work stats
+                let totalSubShifts = 0;
+                let totalSubHours = 0;
+                const subWorkDetails = [];
+                
+                subWorks.forEach(sub => {
+                    const subStats = calculateEmployeeStats(sub, currentMonth, currentYear);
+                    totalSubShifts += subStats.totalShifts;
+                    totalSubHours += subStats.totalHours;
+                    
+                    if (subStats.totalShifts > 0) {
+                        subWorkDetails.push({
+                            pharmacy: sub.pharmacyName,
+                            shifts: subStats.totalShifts,
+                            hours: subStats.totalHours,
+                            shiftDetails: subStats.shifts
+                        });
+                    }
+                });
+                
+                // Apply filters
+                const periodKey = `${currentYear}_${currentMonth}`;
+                const currentPeriodComps = employeeCompensations.filter(comp => comp.period === periodKey);
+                const hasSubworkOrCompensation = subWorks.length > 0 || currentPeriodComps.length > 0;
+                const hasAnyCompensation = employeeCompensations.length > 0;
+                
+                // Определяем, нужно ли показывать сотрудника (только один фильтр может быть выбран)
+                let shouldShow = false;
+                
+                if (selectedFilter === 'all') {
+                    // "Все сотрудники" - показываем всех
+                    shouldShow = true;
+                } else if (selectedFilter === 'subwork') {
+                    // "С подработкой/компенсацией к ЗП" - только с подработками или компенсациями за текущий период
+                    shouldShow = hasSubworkOrCompensation;
+                } else if (selectedFilter === 'compensation') {
+                    // "Компенсация к СЗ" - только с компенсациями за текущий период
+                    shouldShow = currentPeriodComps.length > 0;
+                }
+                
+                if (!shouldShow) {
+                    return;
+                }
+                
+                html += `
+                    <div class="employee-section">
+                        <div class="employee-header">${employeeName}</div>
+                        
+                        <div class="employee-info">
+                            <div class="info-item">
+                                <div class="info-label">Основная аптека</div>
+                                <div class="info-value">${mainPharmacyName}${mainWork ? '' : ' (отсутствует за этот месяц)'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Должность</div>
+                                <div class="info-value">${mainPosition}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Период</div>
+                                <div class="info-value">${getMonthName(currentMonth)} ${currentYear}</div>
+                            </div>
+                        </div>
+                `;
+                
+                // Main work section (показываем только если есть основная работа и не выбран фильтр "Компенсация к СЗ")
+                if (mainWork && selectedFilter !== 'compensation') {
+                    html += `
+                        <div class="section-title">🏢 Основная работа</div>
+                        <div class="summary-card">
+                            <div class="summary-title">Итого по основной работе:</div>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="summary-label">Всего смен</div>
+                                    <div class="summary-value">${mainShifts}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Всего часов</div>
+                                    <div class="summary-value">${mainHours}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Sub works section (показываем только если есть подработки и не выбран фильтр "Компенсация к СЗ")
+                if (subWorks.length > 0 && selectedFilter !== 'compensation') {
+                    html += `
+                        <div class="section-title">💼 Подработки</div>
+                        <div class="summary-card">
+                            <div class="summary-title">Итого по подработкам:</div>
+                            <div class="summary-grid">
+                                <div class="summary-item">
+                                    <div class="summary-label">Всего смен</div>
+                                    <div class="summary-value">${totalSubShifts}</div>
+                                </div>
+                                <div class="summary-item">
+                                    <div class="summary-label">Всего часов</div>
+                                    <div class="summary-value">${totalSubHours}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Аптека</th>
+                                    <th>Количество смен</th>
+                                    <th>Часов</th>
+                                    <th>Детали смен</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    subWorkDetails.forEach(detail => {
+                        const shiftDetails = detail.shiftDetails.map(s => {
+                            return `${formatDate(s.day, currentMonth, currentYear)}: ${String(s.start).padStart(2, '0')}:00-${String(s.end).padStart(2, '0')}:00 (${s.hours}ч)`;
+                        }).join('<br>');
+                        
+                        html += `
+                            <tr>
+                                <td>${detail.pharmacy}</td>
+                                <td>${detail.shifts}</td>
+                                <td>${detail.hours}</td>
+                                <td style="font-size: 11px;">${shiftDetails || '-'}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `
+                            </tbody>
+                        </table>
+                    `;
+                }
+                // Если подработок нет, секция не отображается вообще
+                
+                // Compensations section (показываем только если есть компенсации за текущий период)
+                const compPeriodKey = `${currentYear}_${currentMonth}`;
+                const compsToShow = employeeCompensations.filter(comp => comp.period === compPeriodKey); // Только за текущий период
+                
+                if (compsToShow.length > 0) {
+                    html += `
+                        <div class="section-title">📝 Служебные записки (компенсации)</div>
+                    `;
+                        let totalAmount = 0;
+                        let totalHours = 0;
+                        
+                        compsToShow.forEach(comp => {
+                            if (comp.valueType === 'hours') {
+                                totalHours += comp.value || 0;
+                            } else {
+                                totalAmount += comp.value || 0;
+                            }
+                        });
+                        
+                        html += `
+                            <div class="summary-card">
+                                <div class="summary-title">Итого по компенсациям за период:</div>
+                                <div class="summary-grid">
+                                    <div class="summary-item">
+                                        <div class="summary-label">Количество записей</div>
+                                        <div class="summary-value">${compsToShow.length}</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="summary-label">Сумма (руб.)</div>
+                                        <div class="summary-value">${totalAmount.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}</div>
+                                    </div>
+                                    <div class="summary-item">
+                                        <div class="summary-label">Часов</div>
+                                        <div class="summary-value">${totalHours}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Сумма / Время</th>
+                                        <th>Тип</th>
+                                        <th>Комментарий</th>
+                                        <th>Дата</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        
+                        compsToShow.forEach(comp => {
+                            const valueText = comp.valueType === 'hours' 
+                                ? `${comp.value} часов` 
+                                : `${comp.value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} руб.`;
+                            const typeText = comp.valueType === 'hours' ? 'Часы' : 'Сумма';
+                            const dateText = comp.date ? new Date(comp.date).toLocaleDateString('ru-RU') : '-';
+                            
+                            html += `
+                                <tr>
+                                    <td>${valueText}</td>
+                                    <td>${typeText}</td>
+                                    <td>${comp.comment || '-'}</td>
+                                    <td>${dateText}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                    html += `
+                                </tbody>
+                            </table>
+                        `;
+                }
+                // Если компенсаций нет, секция не отображается вообще
+                
+                html += '</div>';
+            });
+            
+            if (html === '') {
+                let emptyMessage = 'Нет данных для отображения';
+                if (selectedFilter === 'compensation') {
+                    emptyMessage = 'Нет компенсаций к СЗ';
+                } else if (selectedFilter === 'subwork') {
+                    emptyMessage = 'Нет сотрудников с подработками или компенсациями к ЗП в выбранном периоде.';
+                } else if (selectedFilter === 'all') {
+                    emptyMessage = 'Нет данных о сотрудниках за выбранный месяц.';
+                }
+                contentArea.innerHTML = `<div class="empty-state">${emptyMessage}</div>`;
+            } else {
+                contentArea.innerHTML = html;
+            }
+        }
+
+        // Event listeners for filters (radio buttons - only one can be selected)
+        document.querySelectorAll('input[name="employeeFilter"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    selectedFilter = this.value;
+                    displayAllData();
+                }
+            });
+        });
+        
+        // Event listeners
+        document.getElementById('monthSelect').addEventListener('change', async function() {
+            const newMonth = parseInt(this.value);
+            if (newMonth !== currentMonth) {
+                currentMonth = newMonth;
+                // Сохраняем в Firebase
+                await firebaseSetItem('savedCurrentMonth', currentMonth);
+                loadData();
+            }
+        });
+        
+        document.getElementById('yearSelect').addEventListener('change', async function() {
+            const newYear = parseInt(this.value);
+            if (!isNaN(newYear) && newYear >= 2020 && newYear <= 2030 && newYear !== currentYear) {
+                currentYear = newYear;
+                // Сохраняем в Firebase
+                await firebaseSetItem('savedCurrentYear', currentYear);
+                loadData();
+            }
+        });
+
+        // Также обрабатываем input событие для поля года
+        document.getElementById('yearSelect').addEventListener('input', async function() {
+            const newYear = parseInt(this.value);
+            if (!isNaN(newYear) && newYear >= 2020 && newYear <= 2030 && newYear !== currentYear) {
+                currentYear = newYear;
+                // Сохраняем в Firebase
+                await firebaseSetItem('savedCurrentYear', currentYear);
+                loadData();
+            }
+        });
+
+        // Initialize - загружаем значения из Firebase и синхронизируем select'ы
+        initializeVariables().then(() => {
+            document.getElementById('monthSelect').value = currentMonth;
+            document.getElementById('yearSelect').value = currentYear;
+            
+            // Initialize
+            loadData();
+        });
+    </script>
+</body>
+</html>
+
