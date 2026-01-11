@@ -2661,6 +2661,139 @@
             );
         }
 
+        /* Модальное окно для компенсации Employee Manager */
+        .employee-manager-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 11000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .employee-manager-modal-overlay.active {
+            display: flex;
+        }
+
+        .employee-manager-modal-compensation-content {
+            background: white;
+            border: 2px solid #000;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        .employee-manager-modal-compensation-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .employee-manager-modal-compensation-body {
+            margin-bottom: 20px;
+        }
+
+        .employee-manager-modal-compensation-field {
+            margin-bottom: 15px;
+        }
+
+        .employee-manager-modal-compensation-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .employee-manager-modal-compensation-field input,
+        .employee-manager-modal-compensation-field textarea,
+        .employee-manager-modal-compensation-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #000;
+            border-radius: 0;
+            font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .employee-manager-modal-compensation-field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .employee-manager-modal-compensation-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .employee-manager-modal-compensation-footer button {
+            padding: 10px 20px;
+            border: 1px solid #000;
+            border-radius: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                #f0f0f0 0px,
+                #f0f0f0 4px,
+                rgba(240, 240, 240, 0.3) 4px,
+                rgba(240, 240, 240, 0.3) 8px
+            );
+            color: #000;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .employee-manager-modal-compensation-footer button:hover {
+            background: repeating-linear-gradient(
+                45deg,
+                #e0e0e0 0px,
+                #e0e0e0 4px,
+                rgba(224, 224, 224, 0.3) 4px,
+                rgba(224, 224, 224, 0.3) 8px
+            );
+        }
+
+        .employee-manager-calendar-day.has-subwork.has-absence {
+            background: repeating-linear-gradient(
+                45deg,
+                #b3e5fc 0px,
+                #b3e5fc 4px,
+                rgba(179, 229, 252, 0.5) 4px,
+                rgba(179, 229, 252, 0.5) 8px
+            );
+        }
+
+        .employee-manager-calendar-day.has-shift.weekend {
+            background: repeating-linear-gradient(
+                45deg,
+                #a5d6a7 0px,
+                #a5d6a7 4px,
+                rgba(165, 214, 167, 0.6) 4px,
+                rgba(165, 214, 167, 0.6) 8px
+            );
+        }
+
+        .employee-manager-calendar-day.has-subwork.weekend {
+            background: repeating-linear-gradient(
+                45deg,
+                #90caf9 0px,
+                #90caf9 4px,
+                rgba(144, 202, 249, 0.6) 4px,
+                rgba(144, 202, 249, 0.6) 8px
+            );
+        }
+
         .header-row {
             display: flex;
             flex-wrap: wrap;
@@ -8058,6 +8191,37 @@ function getDisplayValue(employee, day) {
     </div>
 </div>
 
+<!-- Модальное окно для компенсации Employee Manager -->
+<div id="employeeManagerCompensationModal" class="employee-manager-modal-overlay" onclick="closeEmployeeManagerCompensationModal(event)">
+    <div class="employee-manager-modal-compensation-content" onclick="event.stopPropagation()">
+        <div class="employee-manager-modal-compensation-header">Компенсация</div>
+        <div class="employee-manager-modal-compensation-body">
+            <div class="employee-manager-modal-compensation-field">
+                <label>Сумма / Время:</label>
+                <div style="display: flex; gap: 5px; align-items: stretch; width: 100%; box-sizing: border-box;">
+                    <input type="number" 
+                           id="employeeManagerModalCompensationValue" 
+                           step="0.01"
+                           style="flex: 1; padding: 8px; border: 1px solid #000; border-radius: 0; font-family: inherit; font-size: 14px; box-sizing: border-box; min-width: 0;">
+                    <select id="employeeManagerModalCompensationType" style="padding: 8px 12px; border: 1px solid #000; border-radius: 0; font-family: inherit; font-size: 14px; background: white; width: auto; min-width: 100px; box-sizing: border-box; flex-shrink: 0;">
+                        <option value="amount">руб.</option>
+                        <option value="hours">часов</option>
+                    </select>
+                </div>
+            </div>
+            <div class="employee-manager-modal-compensation-field">
+                <label>Комментарий:</label>
+                <textarea id="employeeManagerModalCompensationComment"></textarea>
+            </div>
+        </div>
+        <div class="employee-manager-modal-compensation-footer">
+            <button class="btn" onclick="saveEmployeeManagerCompensationFromModal()">Сохранить</button>
+            <button class="btn" onclick="deleteEmployeeManagerCompensationFromModal()" style="background: repeating-linear-gradient(45deg, #ffcccc 0px, #ffcccc 4px, rgba(255, 204, 204, 0.3) 4px, rgba(255, 204, 204, 0.3) 8px);">Удалить</button>
+            <button class="btn" onclick="closeEmployeeManagerCompensationModal()">Отмена</button>
+        </div>
+    </div>
+</div>
+
 <!-- КНОПКА ОТКРЫТИЯ САЙДБАРА (перемещена в controls-bottom) -->
 
 <script>
@@ -9281,16 +9445,6 @@ document.addEventListener('keydown', function(e) {
         if (infoEl) infoEl.classList.remove('active');
         
         try {
-            // Проверяем, что аптека выбрана
-            if (!currentPharmacyId || currentPharmacyId === '--') {
-                if (loadingEl) loadingEl.style.display = 'none';
-                if (emptyEl) {
-                    emptyEl.style.display = 'block';
-                    emptyEl.textContent = 'Выберите аптеку в основном графике для просмотра данных по сотрудникам.';
-                }
-                return;
-            }
-            
             // Загружаем данные об отсутствиях
             const absenceDataRaw = await firebaseGetItem('absenceData');
             employeeManagerData.absenceData = absenceDataRaw ? (typeof absenceDataRaw === 'string' ? JSON.parse(absenceDataRaw) : absenceDataRaw) : {};
@@ -9306,7 +9460,10 @@ document.addEventListener('keydown', function(e) {
                 }
             }
             
-            // Загружаем данные сотрудников для выбранного месяца/года (только текущей аптеки)
+            // Очищаем старые данные перед загрузкой новых
+            employeeManagerData.allEmployees = {};
+            
+            // Загружаем данные сотрудников
             await loadEmployeeManagerEmployees();
             
             populateEmployeeManagerSelect();
@@ -9315,7 +9472,13 @@ document.addEventListener('keydown', function(e) {
             if (Object.keys(employeeManagerData.allEmployees).length === 0) {
                 if (emptyEl) {
                     emptyEl.style.display = 'block';
-                    emptyEl.textContent = 'Нет данных о сотрудниках выбранной аптеки за выбранный месяц. Попробуйте выбрать другой месяц.';
+                    emptyEl.textContent = 'Нет данных о сотрудниках выбранной аптеки за выбранный месяц. Попробуйте выбрать другой месяц или аптеку.';
+                }
+            } else {
+                if (emptyEl) emptyEl.style.display = 'none';
+                const selectedEmployeeName = document.getElementById('employeeManagerSelect').value;
+                if (selectedEmployeeName && employeeManagerData.allEmployees[selectedEmployeeName]) {
+                    await displayEmployeeManagerInfo();
                 }
             }
         } catch (error) {
@@ -9340,8 +9503,12 @@ document.addEventListener('keydown', function(e) {
         employeeManagerData.currentMonth = month;
         employeeManagerData.currentYear = year;
         
-        // Загружаем данные только для текущей аптеки
-        if (!currentPharmacyId || currentPharmacyId === '--' || !pharmacyReference || pharmacyReference.length === 0) {
+        if (!pharmacyReference || pharmacyReference.length === 0) {
+            return;
+        }
+        
+        // Проверяем, что аптека выбрана в основном графике
+        if (!currentPharmacyId || currentPharmacyId === '--') {
             return;
         }
         
@@ -9354,38 +9521,61 @@ document.addEventListener('keydown', function(e) {
         });
         
         if (!currentPharmacy) {
-            console.warn('Текущая аптека не найдена:', currentPharmacyId);
             return;
         }
         
+        // Загружаем данные только для текущей аптеки
         const pharmacyId = currentPharmacy.id || currentPharmacy.number;
         const key = getScheduleKey(year, month, pharmacyId);
-        const data = await firebaseGetItem(key);
         
+        const data = await firebaseGetItem(key);
         if (data) {
             const scheduleData = typeof data === 'string' ? JSON.parse(data) : data;
             if (scheduleData && scheduleData.employees) {
                 const employees = Array.isArray(scheduleData.employees) ? scheduleData.employees : [];
+                
                 employees.forEach(emp => {
                     if (!emp.name) return;
                     
-                    // Фильтруем только основных сотрудников (не подработчиков)
-                    const isSubcontractor = emp.isSubcontractor === true || 
-                                           emp.isSubcontractor === 1 || 
-                                           emp.isSubcontractor === 'true' || 
-                                           emp.isSubcontractor === '1';
-                    if (isSubcontractor) return; // Пропускаем подработчиков
+                    // Обработка isSubcontractor как в EmployeeManager.html
+                    let isSubcontractorValue = false;
+                    if ('isSubcontractor' in emp) {
+                        isSubcontractorValue = emp.isSubcontractor === true || 
+                                              emp.isSubcontractor === 1 || 
+                                              emp.isSubcontractor === 'true' || 
+                                              emp.isSubcontractor === '1';
+                    } else {
+                        if (!emp.schedule && !emp.scheduleStartDay) {
+                            isSubcontractorValue = true;
+                        }
+                    }
+                    
+                    // ФИЛЬТРУЕМ: показываем только основных сотрудников (не подработчиков) в списке
+                    if (isSubcontractorValue) {
+                        return; // Пропускаем подработчиков
+                    }
                     
                     if (!employeeManagerData.allEmployees[emp.name]) {
                         employeeManagerData.allEmployees[emp.name] = [];
                     }
                     
+                    // Убеждаемся, что dayOverrides всегда объект
+                    const dayOverrides = emp.dayOverrides || {};
+                    
                     const employeeRecord = {
-                        ...emp,
+                        id: emp.id || '',
+                        position: emp.position || '',
+                        name: emp.name || '',
+                        startHour: emp.startHour !== undefined ? emp.startHour : null,
+                        endHour: emp.endHour !== undefined ? emp.endHour : null,
+                        schedule: emp.schedule !== undefined ? emp.schedule : null,
+                        scheduleStartDay: emp.scheduleStartDay !== undefined ? emp.scheduleStartDay : null,
+                        isSubcontractor: isSubcontractorValue,
+                        dayOverrides: dayOverrides,
                         pharmacyId: pharmacyId,
                         pharmacyNumber: currentPharmacy.number,
                         pharmacyName: `Аптека №${currentPharmacy.number}`,
-                        isMain: !isSubcontractor
+                        isMain: !isSubcontractorValue
                     };
                     
                     employeeManagerData.allEmployees[emp.name].push(employeeRecord);
@@ -9413,7 +9603,7 @@ document.addEventListener('keydown', function(e) {
         });
     }
 
-    function displayEmployeeManagerInfo() {
+    async function displayEmployeeManagerInfo() {
         const employeeName = document.getElementById('employeeManagerSelect').value;
         const infoEl = document.getElementById('employeeManagerInfo');
         const emptyEl = document.getElementById('employeeManagerEmptyState');
@@ -9427,60 +9617,148 @@ document.addEventListener('keydown', function(e) {
         if (emptyEl) emptyEl.style.display = 'none';
         if (infoEl) infoEl.classList.add('active');
 
-        const employeeData = employeeManagerData.allEmployees[employeeName];
+        // Загружаем данные сотрудника из ВСЕХ аптек для отображения подработок
+        const month = employeeManagerData.currentMonth;
+        const year = employeeManagerData.currentYear;
+        let employeeData = [];
         
-        // Находим основную работу (используем логику из EmployeeManager.html)
+        // Загружаем данные из всех аптек для выбранного сотрудника
+        for (const pharmacy of pharmacyReference) {
+            const pharmacyId = pharmacy.id || pharmacy.number;
+            const key = getScheduleKey(year, month, pharmacyId);
+            
+            const data = await firebaseGetItem(key);
+            if (data) {
+                const scheduleData = typeof data === 'string' ? JSON.parse(data) : data;
+                if (scheduleData && scheduleData.employees) {
+                    const employees = Array.isArray(scheduleData.employees) ? scheduleData.employees : [];
+                    
+                    employees.forEach(emp => {
+                        if (!emp.name || emp.name !== employeeName) return;
+                        
+                        // Обработка isSubcontractor
+                        let isSubcontractorValue = false;
+                        if ('isSubcontractor' in emp) {
+                            isSubcontractorValue = emp.isSubcontractor === true || 
+                                                  emp.isSubcontractor === 1 || 
+                                                  emp.isSubcontractor === 'true' || 
+                                                  emp.isSubcontractor === '1';
+                        } else {
+                            if (!emp.schedule && !emp.scheduleStartDay) {
+                                isSubcontractorValue = true;
+                            }
+                        }
+                        
+                        // Убеждаемся, что dayOverrides всегда объект
+                        const dayOverrides = emp.dayOverrides || {};
+                        
+                        const employeeRecord = {
+                            id: emp.id || '',
+                            position: emp.position || '',
+                            name: emp.name || '',
+                            startHour: emp.startHour !== undefined ? emp.startHour : null,
+                            endHour: emp.endHour !== undefined ? emp.endHour : null,
+                            schedule: emp.schedule !== undefined ? emp.schedule : null,
+                            scheduleStartDay: emp.scheduleStartDay !== undefined ? emp.scheduleStartDay : null,
+                            isSubcontractor: isSubcontractorValue,
+                            dayOverrides: dayOverrides,
+                            pharmacyId: pharmacyId,
+                            pharmacyNumber: pharmacy.number,
+                            pharmacyName: `Аптека №${pharmacy.number}`,
+                            isMain: !isSubcontractorValue
+                        };
+                        
+                        employeeData.push(employeeRecord);
+                    });
+                }
+            }
+        }
+        
+        // Определяем основную работу ИСКЛЮЧИТЕЛЬНО из справочника employeeReference
+        let mainWork = null;
         let mainPharmacyId = null;
         const employeeRef = employeeReference.find(e => e.name === employeeName);
+        
         if (employeeRef && employeeRef.pharmacy) {
             mainPharmacyId = String(employeeRef.pharmacy);
-        }
-        
-        let mainWork;
-        if (mainPharmacyId) {
+            
+            // Ищем запись сотрудника для основной аптеки из справочника
             mainWork = employeeData.find(e => {
                 const empPharmacyId = String(e.pharmacyId || '');
-                const empPharmacyNumber = String(e.pharmacyNumber || '');
-                const mainPharmIdStr = String(mainPharmacyId);
-                return empPharmacyId === mainPharmIdStr || empPharmacyNumber === mainPharmIdStr;
+                // Сравниваем по ID аптеки (pharmacyId должен совпадать с pharmacy из справочника)
+                return empPharmacyId === mainPharmacyId;
             });
-        }
-        if (!mainWork) {
-            mainWork = employeeData.find(e => e.isMain === true);
-        }
-        if (!mainWork && employeeData.length > 0) {
-            mainWork = employeeData[0];
+            
+            if (mainWork) {
+                console.log('✓ Найдена основная работа из справочника:', mainPharmacyId, '->', mainWork.pharmacyName);
+            } else {
+                console.log('ℹ Основная аптека из справочника отсутствует в данных за этот месяц:', mainPharmacyId);
+                console.log('  У сотрудника есть только подработки за этот месяц');
+            }
         }
         
-        if (!mainWork) {
+        // Все остальные аптеки - это подработки
+        const subWorks = mainWork 
+            ? employeeData.filter(e => {
+                // Исключаем основную работу
+                return e !== mainWork && 
+                       !(e.pharmacyId === mainWork.pharmacyId && e.pharmacyNumber === mainWork.pharmacyNumber);
+              })
+            : employeeData; // Если основной работы нет, все аптеки считаются подработками
+        
+        // Если нет основной работы, но есть подработки - все равно показываем информацию
+        if (!mainWork && subWorks.length === 0) {
             if (infoEl) infoEl.classList.remove('active');
-            if (emptyEl) emptyEl.style.display = 'block';
+            if (emptyEl) {
+                emptyEl.style.display = 'block';
+                emptyEl.textContent = 'Нет данных о работе сотрудника за выбранный месяц.';
+            }
             return;
         }
-        
-        // Отображаем основную информацию
+
+        // Basic info
         const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
                           'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
         document.getElementById('empManagerName').textContent = employeeName;
-        document.getElementById('empManagerPosition').textContent = mainWork.position || '-';
-        document.getElementById('empManagerPharmacy').textContent = mainWork.pharmacyName || '-';
+        
+        // Если основной работы нет, но есть подработки - показываем информацию о них
+        if (mainWork) {
+            document.getElementById('empManagerPosition').textContent = mainWork.position || '-';
+            document.getElementById('empManagerPharmacy').textContent = mainWork.pharmacyName || '-';
+        } else {
+            // Определяем основную аптеку из справочника для отображения
+            let mainPharmacyName = 'Не указана';
+            if (employeeRef && employeeRef.pharmacy && mainPharmacyId) {
+                const mainPharmacy = pharmacyReference.find(p => String(p.id) === mainPharmacyId);
+                if (mainPharmacy) {
+                    mainPharmacyName = `Аптека №${mainPharmacy.number}`;
+                }
+            }
+            document.getElementById('empManagerPosition').textContent = employeeRef ? (employeeRef.position || '-') : '-';
+            document.getElementById('empManagerPharmacy').textContent = mainPharmacyName + ' (отсутствует за этот месяц)';
+        }
         document.getElementById('empManagerPeriod').textContent = `${monthNames[employeeManagerData.currentMonth]} ${employeeManagerData.currentYear}`;
 
-        // Рассчитываем статистику (упрощенная версия, используя функции из EmployeeManager.html)
-        const mainStats = calculateEmployeeManagerStats(mainWork, employeeManagerData.currentMonth, employeeManagerData.currentYear);
-        
-        // Фильтруем подработки
-        const subWorks = employeeData.filter(e => e !== mainWork && 
-                                                   !(e.pharmacyId === mainWork.pharmacyId && e.pharmacyNumber === mainWork.pharmacyNumber));
-        
-        let totalShifts = mainStats.totalShifts;
-        let mainShifts = mainStats.totalShifts;
+        // Calculate stats
+        let totalShifts = 0;
+        let totalHours = 0;
+        let mainShifts = 0;
         let subShifts = 0;
-        let subHours = 0;
+
+        // Если основной работы нет, создаем пустую статистику
+        const mainStats = mainWork 
+            ? calculateEmployeeManagerStats(mainWork, employeeManagerData.currentMonth, employeeManagerData.currentYear, null, true)
+            : { totalShifts: 0, totalHours: 0, shifts: [] };
         
+        totalShifts += mainStats.totalShifts;
+        totalHours += mainStats.totalHours;
+        mainShifts = mainStats.totalShifts;
+
+        let subHours = 0;
         subWorks.forEach(sub => {
-            const subStats = calculateEmployeeManagerStats(sub, employeeManagerData.currentMonth, employeeManagerData.currentYear);
+            const subStats = calculateEmployeeManagerStats(sub, employeeManagerData.currentMonth, employeeManagerData.currentYear, null, false);
             totalShifts += subStats.totalShifts;
+            totalHours += subStats.totalHours;
             subShifts += subStats.totalShifts;
             subHours += subStats.totalHours;
         });
@@ -9491,13 +9769,76 @@ document.addEventListener('keydown', function(e) {
         document.getElementById('subManagerShifts').textContent = subShifts;
         document.getElementById('subManagerHours').textContent = subHours + ' часов';
 
-        // Отображаем календарь и другие данные
+        // Display combined calendar with main work, sub works and absences
         displayEmployeeManagerCalendar(mainWork, mainStats, subWorks, employeeName);
+        
+        // Display compensation table
         displayEmployeeManagerCompensation(employeeName);
+        
+        // Display absences table
         displayEmployeeManagerAbsences(employeeName);
     }
 
-    function calculateEmployeeManagerStats(employee, month, year) {
+    // Helper functions для Employee Manager
+    function parseScheduleEmployeeManager(scheduleStr) {
+        if (!scheduleStr) return null;
+        const parts = scheduleStr.split('/');
+        if (parts.length === 2) {
+            return {
+                workDays: parseInt(parts[0]),
+                offDays: parseInt(parts[1])
+            };
+        }
+        return null;
+    }
+
+    function isStandardWorkDayEmployeeManager(employee, day, month, year) {
+        if (!employee.schedule) return null;
+        const schedule = parseScheduleEmployeeManager(employee.schedule);
+        if (!schedule) return null;
+
+        let startDay = employee.scheduleStartDay || 1;
+        // Fix for days before startDay
+        if (day < startDay) {
+            if (schedule.workDays === 5 && schedule.offDays === 2) {
+                 return isWeekend(day, month, year) ? false : null;
+            }
+            return null;
+        }
+
+        if (schedule.workDays === 5 && schedule.offDays === 2) {
+            return !isWeekend(day, month, year);
+        }
+
+        const dayInCycle = (day - startDay) % (schedule.workDays + schedule.offDays);
+        return dayInCycle < schedule.workDays;
+    }
+
+    function getDisplayValueEmployeeManager(employee, day, month, year) {
+        // Логика как в Grafick: сначала проверяем dayOverrides, потом стандартный график
+        const overrides = employee.dayOverrides || {};
+        
+        // Проверяем оба формата ключа (число и строка), так как Firebase может сохранять по-разному
+        let dayValue = overrides[day];
+        if (dayValue === undefined || dayValue === null) {
+            dayValue = overrides[String(day)];
+        }
+        
+        if (dayValue !== undefined && dayValue !== null) {
+            return dayValue === "" ? null : dayValue;
+        }
+        
+        // Если нет в dayOverrides, вычисляем по стандартному графику (как в Grafick)
+        const isWork = isStandardWorkDayEmployeeManager(employee, day, month, year);
+        if (isWork === true) {
+            if (employee.startHour !== undefined && employee.endHour !== undefined) {
+                return employee.startHour + "-" + employee.endHour;
+            }
+        }
+        return null;
+    }
+
+    function calculateEmployeeManagerStats(employee, month, year, pharmacyData, isMainWork = false) {
         if (!employee) {
             return { totalShifts: 0, totalHours: 0, shifts: [] };
         }
@@ -9506,112 +9847,39 @@ document.addEventListener('keydown', function(e) {
         let totalShifts = 0;
         let totalHours = 0;
         const shifts = [];
-
-        // Проверяем dayOverrides
-        if (employee.dayOverrides && typeof employee.dayOverrides === 'object') {
-            for (let day = 1; day <= daysInMonth; day++) {
-                const absence = getAbsenceForEmployeeManager(employee.name, day, month, year);
-                if (absence) continue;
-                
-                let override = employee.dayOverrides[day];
-                if (!override && employee.dayOverrides[String(day)]) override = employee.dayOverrides[String(day)];
-                
-                if (override && override !== '' && override !== null && override !== undefined) {
-                    const shift = parseShiftEmployeeManager(override);
-                    if (shift) {
-                        totalShifts++;
-                        totalHours += shift.hours;
-                        shifts.push({
-                            day,
-                            start: shift.start,
-                            end: shift.end,
-                            hours: shift.hours,
-                            type: 'override',
-                            pharmacyId: employee.pharmacyId
-                        });
-                    }
-                }
+        
+        // Используем ту же логику, что и в Grafick: сначала проверяем dayOverrides,
+        // если нет - вычисляем по стандартному графику (schedule)
+        
+        // Проходим по всем дням месяца
+        for (let day = 1; day <= daysInMonth; day++) {
+            // Пропускаем дни отсутствия
+            const absence = getAbsenceForEmployeeManager(employee.name, day, month, year);
+            if (absence) {
+                continue;
             }
-        }
-
-        // Проверяем стандартное расписание
-        if (employee.schedule && employee.schedule !== '') {
-            const schedulePattern = employee.schedule.match(/^(\d+)\/(\d+)$/);
             
-            if (schedulePattern) {
-                const workDays = parseInt(schedulePattern[1]);
-                const restDays = parseInt(schedulePattern[2]);
-                const cycleLength = workDays + restDays;
-                const startDay = employee.scheduleStartDay || 1;
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const absence = getAbsenceForEmployeeManager(employee.name, day, month, year);
-                    if (absence) continue;
-                    
-                    if (employee.dayOverrides && employee.dayOverrides[day] && employee.dayOverrides[day] !== '') {
-                        continue;
-                    }
-                    
-                    const dayInCycle = ((day - startDay) % cycleLength + cycleLength) % cycleLength;
-                    const shouldWork = dayInCycle < workDays;
-                    
-                    if (shouldWork && employee.startHour && employee.endHour) {
-                        const shift = parseShiftEmployeeManager(`${employee.startHour}-${employee.endHour}`);
-                        if (shift) {
-                            totalShifts++;
-                            totalHours += shift.hours;
-                            shifts.push({
-                                day,
-                                start: shift.start,
-                                end: shift.end,
-                                hours: shift.hours,
-                                type: 'schedule',
-                                pharmacyId: employee.pharmacyId
-                            });
-                        }
-                    }
-                }
-            } else {
-                const trimmedSchedule = employee.schedule.trim();
-                let scheduleDays = [];
-                if (/^\d+$/.test(trimmedSchedule)) {
-                    scheduleDays = [parseInt(trimmedSchedule)];
-                } else {
-                    scheduleDays = employee.schedule.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
-                }
-                
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const absence = getAbsenceForEmployeeManager(employee.name, day, month, year);
-                    if (absence) continue;
-                    
-                    if (employee.dayOverrides && employee.dayOverrides[day] && employee.dayOverrides[day] !== '') {
-                        continue;
-                    }
-                    
-                    const date = new Date(year, month, day);
-                    let dayOfWeekNum = date.getDay();
-                    dayOfWeekNum = dayOfWeekNum === 0 ? 6 : dayOfWeekNum - 1;
-                    const shouldWork = scheduleDays.includes(dayOfWeekNum);
-                    
-                    if (shouldWork && employee.startHour && employee.endHour) {
-                        const shift = parseShiftEmployeeManager(`${employee.startHour}-${employee.endHour}`);
-                        if (shift) {
-                            totalShifts++;
-                            totalHours += shift.hours;
-                            shifts.push({
-                                day,
-                                start: shift.start,
-                                end: shift.end,
-                                hours: shift.hours,
-                                type: 'schedule',
-                                pharmacyId: employee.pharmacyId
-                            });
-                        }
-                    }
+            // Получаем значение смены (как в Grafick - сначала из dayOverrides, потом из графика)
+            const shiftValue = getDisplayValueEmployeeManager(employee, day, month, year);
+            
+            // Если есть значение смены - парсим и добавляем
+            if (shiftValue && shiftValue !== '') {
+                const shift = parseShiftEmployeeManager(shiftValue);
+                if (shift) {
+                    totalShifts++;
+                    totalHours += shift.hours;
+                    shifts.push({
+                        day: day,
+                        start: shift.start,
+                        end: shift.end,
+                        hours: shift.hours,
+                        type: (employee.dayOverrides && employee.dayOverrides[day] !== undefined) ? 'firebase' : 'schedule',
+                        pharmacyId: employee.pharmacyId
+                    });
                 }
             }
         }
-
+        
         return { totalShifts, totalHours, shifts };
     }
 
@@ -9621,8 +9889,11 @@ document.addEventListener('keydown', function(e) {
         if (match) {
             const start = parseInt(match[1]);
             const end = parseInt(match[2]);
-            let hours = end - start - 1;
-            if (hours < 0) hours += 24;
+            // Правильный расчет часов: с 9 до 18 = 9 часов работы минус 1 час на обед = 8 часов
+            let hours = end - start;
+            // Вычитаем 1 час на обеденный перерыв
+            hours = Math.max(0, hours - 1);
+            if (hours < 0 || hours > 24) return null;
             return { start, end, hours };
         }
         return null;
@@ -9654,17 +9925,22 @@ document.addEventListener('keydown', function(e) {
         
         // Собираем все смены
         const allShifts = [];
-        mainStats.shifts.forEach(shift => {
-            allShifts.push({
-                ...shift,
-                isMain: true,
-                pharmacyName: mainWork.pharmacyName,
-                pharmacyNumber: mainWork.pharmacyNumber
-            });
-        });
         
+        // Add main work shifts (если основная работа есть)
+        if (mainWork) {
+            mainStats.shifts.forEach(shift => {
+                allShifts.push({
+                    ...shift,
+                    isMain: true,
+                    pharmacyName: mainWork.pharmacyName,
+                    pharmacyNumber: mainWork.pharmacyNumber
+                });
+            });
+        }
+        
+        // Add sub work shifts
         subWorks.forEach(sub => {
-            const subStats = calculateEmployeeManagerStats(sub, employeeManagerData.currentMonth, employeeManagerData.currentYear);
+            const subStats = calculateEmployeeManagerStats(sub, employeeManagerData.currentMonth, employeeManagerData.currentYear, null, false); // isMainWork = false
             subStats.shifts.forEach(shift => {
                 allShifts.push({
                     ...shift,
@@ -9792,15 +10068,39 @@ document.addEventListener('keydown', function(e) {
                 foundData = employeeManagerData.compensationData[shortName];
                 actualEmployeeKey = shortName;
             } else {
-                container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Нет данных о компенсациях</p>';
-                return;
+                const safeKey = encodeFirebaseKeyEmployeeManager(employeeName);
+                if (employeeManagerData.compensationData && employeeManagerData.compensationData[safeKey]) {
+                    foundData = employeeManagerData.compensationData[safeKey];
+                    actualEmployeeKey = safeKey;
+                } else {
+                    container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Нет данных о компенсациях</p>';
+                    return;
+                }
             }
         }
         
         employeeName = actualEmployeeKey;
         const employeeCompensations = employeeManagerData.compensationData[employeeName];
+        
         const periodKey = `${employeeManagerData.currentYear}_${employeeManagerData.currentMonth}`;
+        const possibleKeys = [
+            periodKey,
+            `${employeeManagerData.currentYear}_${String(employeeManagerData.currentMonth).padStart(2, '0')}`,
+            `${employeeManagerData.currentYear}-${employeeManagerData.currentMonth}`,
+            `${employeeManagerData.currentYear}-${String(employeeManagerData.currentMonth).padStart(2, '0')}`
+        ];
+        
         let currentCompensations = employeeCompensations[periodKey] || [];
+        
+        // Если не нашли, пробуем другие варианты
+        if (currentCompensations.length === 0) {
+            for (const key of possibleKeys) {
+                if (employeeCompensations[key] && employeeCompensations[key].length > 0) {
+                    currentCompensations = employeeCompensations[key];
+                    break;
+                }
+            }
+        }
         
         if (currentCompensations.length === 0) {
             container.innerHTML = '<p style="padding: 20px; text-align: center; color: #999;">Нет компенсаций в выбранном месяце</p>';
@@ -9825,8 +10125,11 @@ document.addEventListener('keydown', function(e) {
                 : `${comp.value.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} ${valueTypeDisplay}`;
             const commentText = comp.comment || '';
             
+            // Режим просмотра - текст, кликабельная строка
             html += `
-                <tr>
+                <tr class="employee-manager-compensation-row" 
+                    data-index="${index}" 
+                    onclick="openEmployeeManagerCompensationModal('${employeeName.replace(/'/g, "\\'")}', ${employeeManagerData.currentYear}, ${employeeManagerData.currentMonth}, ${index})">
                     <td>${valueText}</td>
                     <td>${commentText}</td>
                 </tr>
@@ -9932,6 +10235,187 @@ document.addEventListener('keydown', function(e) {
         return `${lastName} ${initials}`.trim();
     }
 
+    // Переменные для хранения текущей редактируемой компенсации Employee Manager
+    let currentEditingEmployeeManagerCompensation = {
+        employeeName: null,
+        year: null,
+        month: null,
+        index: null
+    };
+
+    // Функция открытия модального окна компенсации Employee Manager
+    window.openEmployeeManagerCompensationModal = function(employeeName, year, month, index) {
+        const periodKey = `${year}_${month}`;
+        if (!employeeManagerData.compensationData[employeeName] || !employeeManagerData.compensationData[employeeName][periodKey]) {
+            alert('Данные не найдены');
+            return;
+        }
+        
+        const compensation = employeeManagerData.compensationData[employeeName][periodKey][index];
+        if (!compensation) {
+            alert('Запись не найдена');
+            return;
+        }
+        
+        // Сохраняем информацию о редактируемой компенсации
+        currentEditingEmployeeManagerCompensation = {
+            employeeName: employeeName,
+            year: year,
+            month: month,
+            index: index
+        };
+        
+        // Заполняем поля модального окна
+        document.getElementById('employeeManagerModalCompensationValue').value = compensation.value || 0;
+        document.getElementById('employeeManagerModalCompensationType').value = compensation.valueType || 'amount';
+        document.getElementById('employeeManagerModalCompensationComment').value = compensation.comment || '';
+        
+        // Устанавливаем правильный step для input в зависимости от типа
+        const valueInput = document.getElementById('employeeManagerModalCompensationValue');
+        const typeSelect = document.getElementById('employeeManagerModalCompensationType');
+        valueInput.step = compensation.valueType === 'hours' ? '1' : '0.01';
+        
+        // Обработчик изменения типа для обновления step
+        typeSelect.onchange = function() {
+            valueInput.step = this.value === 'hours' ? '1' : '0.01';
+        };
+        
+        // Показываем модальное окно
+        document.getElementById('employeeManagerCompensationModal').classList.add('active');
+    }
+
+    // Функция закрытия модального окна компенсации Employee Manager
+    window.closeEmployeeManagerCompensationModal = function(event) {
+        if (event && event.target !== event.currentTarget) {
+            return; // Не закрываем, если клик был внутри модального окна
+        }
+        document.getElementById('employeeManagerCompensationModal').classList.remove('active');
+    }
+
+    // Функция сохранения из модального окна компенсации Employee Manager
+    window.saveEmployeeManagerCompensationFromModal = async function() {
+        const { employeeName, year, month, index } = currentEditingEmployeeManagerCompensation;
+        if (!employeeName || index === null) {
+            alert('Ошибка: данные не найдены');
+            return;
+        }
+        
+        const periodKey = `${year}_${month}`;
+        if (!employeeManagerData.compensationData[employeeName] || !employeeManagerData.compensationData[employeeName][periodKey]) {
+            alert('Данные не найдены');
+            return;
+        }
+        
+        const compensation = employeeManagerData.compensationData[employeeName][periodKey][index];
+        if (!compensation) {
+            alert('Запись не найдена');
+            return;
+        }
+        
+        // Получаем значения из модального окна
+        const newValue = parseFloat(document.getElementById('employeeManagerModalCompensationValue').value) || 0;
+        const newValueType = document.getElementById('employeeManagerModalCompensationType').value;
+        const newComment = document.getElementById('employeeManagerModalCompensationComment').value.trim();
+        
+        if (newValue <= 0) {
+            alert('Значение должно быть больше нуля');
+            return;
+        }
+        
+        // Обновляем данные
+        compensation.value = newValue;
+        compensation.valueType = newValueType;
+        compensation.comment = newComment;
+        
+        // Сохраняем в Firebase
+        try {
+            const encodedData = {};
+            for (const key in employeeManagerData.compensationData) {
+                const safeKey = encodeFirebaseKeyEmployeeManager(key);
+                encodedData[safeKey] = employeeManagerData.compensationData[key];
+            }
+            const success = await firebaseSetItem('compensationData', encodedData);
+            if (success) {
+                // Обновляем локальные данные
+                employeeManagerData.compensationData = {};
+                for (const safeKey in encodedData) {
+                    const originalKey = decodeFirebaseKeyEmployeeManager(safeKey);
+                    employeeManagerData.compensationData[originalKey] = encodedData[safeKey];
+                }
+                alert('Данные сохранены!');
+                // Закрываем модальное окно
+                closeEmployeeManagerCompensationModal();
+                // Обновляем отображение
+                displayEmployeeManagerCompensation(employeeName);
+            } else {
+                alert('Ошибка при сохранении данных');
+            }
+        } catch (error) {
+            console.error('Ошибка при сохранении компенсации:', error);
+            alert('Ошибка при сохранении: ' + error.message);
+        }
+    }
+
+    // Функция удаления из модального окна компенсации Employee Manager
+    window.deleteEmployeeManagerCompensationFromModal = async function() {
+        if (!confirm('Вы уверены, что хотите удалить эту запись?')) {
+            return;
+        }
+        
+        const { employeeName, year, month, index } = currentEditingEmployeeManagerCompensation;
+        if (!employeeName || index === null) {
+            alert('Ошибка: данные не найдены');
+            return;
+        }
+        
+        const periodKey = `${year}_${month}`;
+        if (!employeeManagerData.compensationData[employeeName] || !employeeManagerData.compensationData[employeeName][periodKey]) {
+            alert('Данные не найдены');
+            return;
+        }
+        
+        // Удаляем компенсацию
+        employeeManagerData.compensationData[employeeName][periodKey].splice(index, 1);
+        
+        // Если массив периода пуст, удаляем период
+        if (employeeManagerData.compensationData[employeeName][periodKey].length === 0) {
+            delete employeeManagerData.compensationData[employeeName][periodKey];
+        }
+        
+        // Если у сотрудника нет компенсаций, удаляем запись сотрудника
+        if (Object.keys(employeeManagerData.compensationData[employeeName]).length === 0) {
+            delete employeeManagerData.compensationData[employeeName];
+        }
+        
+        // Сохраняем в Firebase
+        try {
+            const encodedData = {};
+            for (const key in employeeManagerData.compensationData) {
+                const safeKey = encodeFirebaseKeyEmployeeManager(key);
+                encodedData[safeKey] = employeeManagerData.compensationData[key];
+            }
+            const success = await firebaseSetItem('compensationData', encodedData);
+            if (success) {
+                // Обновляем локальные данные
+                employeeManagerData.compensationData = {};
+                for (const safeKey in encodedData) {
+                    const originalKey = decodeFirebaseKeyEmployeeManager(safeKey);
+                    employeeManagerData.compensationData[originalKey] = encodedData[safeKey];
+                }
+                alert('Запись удалена!');
+                // Закрываем модальное окно
+                closeEmployeeManagerCompensationModal();
+                // Обновляем отображение
+                displayEmployeeManagerCompensation(employeeName);
+            } else {
+                alert('Ошибка при удалении данных');
+            }
+        } catch (error) {
+            console.error('Ошибка при удалении компенсации:', error);
+            alert('Ошибка при удалении: ' + error.message);
+        }
+    }
+
     // Event listeners для менеджера сотрудников
     document.addEventListener('DOMContentLoaded', function() {
         const employeeSelect = document.getElementById('employeeManagerSelect');
@@ -9942,19 +10426,66 @@ document.addEventListener('keydown', function(e) {
             employeeSelect.addEventListener('change', displayEmployeeManagerInfo);
         }
         if (monthSelect) {
-            monthSelect.addEventListener('change', function() {
-                loadEmployeeManagerEmployees().then(() => {
+            monthSelect.addEventListener('change', async function() {
+                const newMonth = parseInt(this.value);
+                if (newMonth !== employeeManagerData.currentMonth) {
+                    // Обновляем месяц в EmployeeManager
+                    employeeManagerData.currentMonth = newMonth;
+                    // Синхронизируем с основным графиком
+                    currentMonth = newMonth;
+                    // Сохраняем в Firebase
+                    await firebaseSetItem('savedCurrentMonth', newMonth);
+                    // Обновляем селектор в основном графике
+                    const mainMonthSelect = document.getElementById('monthSelect');
+                    if (mainMonthSelect) mainMonthSelect.value = newMonth;
+                    // Обновляем отображение месяца в основном графике
+                    if (typeof updateMonthDisplay === 'function') {
+                        updateMonthDisplay();
+                    }
+                    // Перезагружаем данные EmployeeManager
+                    await loadEmployeeManagerEmployees();
                     populateEmployeeManagerSelect();
                     displayEmployeeManagerInfo();
-                });
+                }
             });
         }
         if (yearSelect) {
-            yearSelect.addEventListener('change', function() {
-                loadEmployeeManagerEmployees().then(() => {
+            yearSelect.addEventListener('change', async function() {
+                const newYear = parseInt(this.value);
+                if (!isNaN(newYear) && newYear >= 2020 && newYear <= 2030 && newYear !== employeeManagerData.currentYear) {
+                    // Обновляем год в EmployeeManager
+                    employeeManagerData.currentYear = newYear;
+                    // Синхронизируем с основным графиком
+                    currentYear = newYear;
+                    // Сохраняем в Firebase
+                    await firebaseSetItem('savedCurrentYear', newYear);
+                    // Обновляем поле года в основном графике
+                    const mainYearInput = document.getElementById('yearInput');
+                    if (mainYearInput) mainYearInput.value = newYear;
+                    // Перезагружаем данные EmployeeManager
+                    await loadEmployeeManagerEmployees();
                     populateEmployeeManagerSelect();
                     displayEmployeeManagerInfo();
-                });
+                }
+            });
+            // Также обрабатываем input событие для поля года
+            yearSelect.addEventListener('input', async function() {
+                const newYear = parseInt(this.value);
+                if (!isNaN(newYear) && newYear >= 2020 && newYear <= 2030 && newYear !== employeeManagerData.currentYear) {
+                    // Обновляем год в EmployeeManager
+                    employeeManagerData.currentYear = newYear;
+                    // Синхронизируем с основным графиком
+                    currentYear = newYear;
+                    // Сохраняем в Firebase
+                    await firebaseSetItem('savedCurrentYear', newYear);
+                    // Обновляем поле года в основном графике
+                    const mainYearInput = document.getElementById('yearInput');
+                    if (mainYearInput) mainYearInput.value = newYear;
+                    // Перезагружаем данные EmployeeManager
+                    await loadEmployeeManagerEmployees();
+                    populateEmployeeManagerSelect();
+                    displayEmployeeManagerInfo();
+                }
             });
         }
     });
